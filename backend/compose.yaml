@@ -1,0 +1,13 @@
+services:
+  book-management:
+    image: postgres:16.4
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: testdb
+    volumes:
+      - book-management-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+volumes:
+  book-management-data:
