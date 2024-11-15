@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: testuser
+    password: testpass
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+# prod db bookmanagementdb
+
+# 1-minute session
+# jwt:
+#   secret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
+#   expiration: 60000
+#   jwtRefreshExpirationMs: 120000
+
+# 5-minute session
+##jwt:
+##  secret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
+##  expiration: 300000  # 5 minutes in milliseconds
+##  jwtRefreshExpirationMs: 600000  # 10 minutes for refresh token (optional, adjust as needed)

@@ -8,6 +8,11 @@
   </head>
   <body>
     <div id="app"></div>
+    <script>
+        window.env = {
+            VITE_API_BASE_URL: '${VITE_API_BASE_URL}'  // This gets replaced at runtime
+        };
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

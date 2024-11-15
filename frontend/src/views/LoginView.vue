@@ -48,7 +48,6 @@ export default defineComponent({
         localStorage.setItem('username', user);
         setTokenExpiration(token);
 
-        console.log('Login Success', response.data);
         await router.push('/');
 
       } catch (error) {

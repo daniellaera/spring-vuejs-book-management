@@ -18,8 +18,8 @@ public class CorsConfig {
 
         // Allow multiple origins: development and production
         List<String> allowedOrigins = Arrays.asList(
-                "http://localhost:5173"  // Local development
-                // Production frontend URL "https://spring-vue-blog-frontend.fly.dev"
+                "http://localhost:5173",  // Local development
+                "https://spring-vue-book-management-frontend.fly.dev/"
         );
         corsConfiguration.setAllowedOrigins(allowedOrigins);
 
