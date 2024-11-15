@@ -1,0 +1,12 @@
+[
+  {
+    "title": "Advanced Java Programming",
+    "isbn": "978-0987654321",
+    "description": "Deep dive into advanced Java topics."
+  },
+  {
+    "title": "Spring Boot Basics",
+    "isbn": "978-1234567890",
+    "description": "A comprehensive guide to Spring Boot."
+  }
+]

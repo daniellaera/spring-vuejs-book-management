@@ -1,5 +1,6 @@
 package com.daniellaera.backend.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -12,6 +13,9 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -19,7 +23,7 @@ public class CorsConfig {
         // Allow multiple origins: development and production
         List<String> allowedOrigins = Arrays.asList(
                 "http://localhost:5173",  // Local development
-                "https://spring-vue-book-management-frontend.fly.dev/"
+                frontendUrl
         );
         corsConfiguration.setAllowedOrigins(allowedOrigins);
 

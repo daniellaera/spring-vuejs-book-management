@@ -6,12 +6,19 @@
     },
     {
       "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.vitest.json"
     }
   ],
   "compilerOptions": {
-    "module": "NodeNext"
-  }
+    "target": "ES6",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "jsx": "react",
+    "types": ["vitest/globals", "cypress"]
+  },
+
 }
