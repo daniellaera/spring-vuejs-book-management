@@ -15,6 +15,12 @@
 
       <button type="submit" class="btn">Sign Up</button>
 
+      <!-- Show error message if login failed -->
+      <div v-if="errorMessage" class="error-message">
+        <p>{{ errorMessage }}</p>
+      </div>
+
+
       <div class="login-link">
         <p>Already have an account? <RouterLink to="/login">Login</RouterLink></p>
       </div>
@@ -37,6 +43,8 @@ export default defineComponent({
       password: ''
     });
 
+    const errorMessage = ref<string | null>(null);  // Reactive error message
+
     const handleSignUp = async () => {
       try {
         const response = await apiClient.post('/auth/signup', signUpData.value);
@@ -44,13 +52,20 @@ export default defineComponent({
 
         // Optionally, redirect after successful sign-up
         await router.push('/login');
-      } catch (error) {
+      } catch (error: any) {
+        if (error.response) {
+          // If the response contains a message (like "Invalid username or password")
+          errorMessage.value = error.response.data || 'An error occurred. Please try again.';
+        } else {
+          errorMessage.value = 'An unknown error occurred. Please try again.';
+        }
         console.error('Sign Up Failed', error);
       }
     };
 
     return {
       signUpData,
+      errorMessage,
       handleSignUp
     };
   }
@@ -148,5 +163,11 @@ body.night-mode button.btn:hover {
 
 .login-link a:hover {
   text-decoration: underline;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 1rem;
 }
 </style>

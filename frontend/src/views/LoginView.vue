@@ -15,6 +15,11 @@
 
       <button type="submit" class="btn">Login</button>
 
+      <!-- Show error message if login failed -->
+      <div v-if="errorMessage" class="error-message">
+        <p>{{ errorMessage }}</p>
+      </div>
+
       <div class="register-link">
         <p>Don't have an account? <RouterLink to="/signup">Register</RouterLink></p>
       </div>
@@ -38,6 +43,8 @@ export default defineComponent({
       password: ''
     });
 
+    const errorMessage = ref<string | null>(null);  // Reactive error message
+
     const handleLogin = async () => {
       try {
         const response = await apiClient.post('/auth/signin', loginData.value);
@@ -50,8 +57,20 @@ export default defineComponent({
 
         await router.push('/');
 
-      } catch (error) {
+        // Clear error message if login is successful
+        errorMessage.value = null;
+
+      } catch (error: any) {
         console.error('Login Failed', error);
+
+        if (error.response) {
+          // If the response contains a message (like "Invalid username or password")
+          errorMessage.value = error.response.data || 'An error occurred. Please try again.';
+        } else {
+          errorMessage.value = 'An unknown error occurred. Please try again.';
+        }
+
+        // Clear the local storage on failed login attempt
         localStorage.removeItem('auth_token');
         localStorage.removeItem('username');
       }
@@ -59,7 +78,8 @@ export default defineComponent({
 
     return {
       loginData,
-      handleLogin
+      handleLogin,
+      errorMessage
     };
   }
 });
@@ -156,5 +176,12 @@ body.night-mode button.btn:hover {
 
 .register-link a:hover {
   text-decoration: underline;
+}
+
+/* Error message styling */
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 1rem;
 }
 </style>

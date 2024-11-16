@@ -7,7 +7,7 @@
 
     <!-- Welcome message with Full Name -->
     <div v-if="isLoggedIn && sessionState.timeLeft > 0" class="welcome-message">
-      Welcome back, {{ sessionState.userDetails.fullName || 'Guest' }}
+      Welcome back, {{ getFullName() }}
     </div>
 
     <!-- Countdown timer or session expired message -->
@@ -68,7 +68,6 @@ const logoutUser = async () => {
   try {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('username');
-
   } catch (error) {
     console.error('Error logging out:', error);
   }
@@ -80,6 +79,16 @@ watch(isLoggedIn, (newVal) => {
     updateUserDetails(apiClient); // Fetch user details on login
   }
 });
+
+const getFullName = () => {
+  const userDetails = sessionState.userDetails.fullName
+
+  if (userDetails === "null null") {
+    return 'Guest';
+  }
+
+  return userDetails;
+};
 </script>
 
 <style scoped>
