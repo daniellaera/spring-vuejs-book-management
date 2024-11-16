@@ -3,10 +3,11 @@
     <RouterLink to="/" class="nav-button">Home</RouterLink>
     <RouterLink v-if="!isLoggedIn" to="/signup" class="nav-button">Register</RouterLink>
     <RouterLink v-if="!isLoggedIn" to="/login" class="nav-button">Login</RouterLink>
+    <button v-if="isLoggedIn" @click="logout" class="nav-button">Logout</button>
 
-    <!-- Welcome message when user is logged in -->
+    <!-- Welcome message with Full Name -->
     <div v-if="isLoggedIn && sessionState.timeLeft > 0" class="welcome-message">
-      Welcome back
+      Welcome back, {{ sessionState.userDetails.fullName || 'Guest' }}
     </div>
 
     <!-- Countdown timer or session expired message -->
@@ -17,7 +18,7 @@
       Your session has expired. Please log in again.
     </div>
 
-    <!-- Night mode toggle button with icon -->
+    <!-- Night mode toggle button -->
     <button @click="toggleNightMode" class="night-mode-toggle">
       <span v-if="isNightMode">🌙</span> <!-- Moon icon for night mode -->
       <span v-else>🌞</span> <!-- Sun icon for day mode -->
@@ -26,44 +27,58 @@
 </template>
 
 <script setup lang="ts">
-import { isLoggedIn, sessionState } from '@/service/useSession';
-import { ref, computed, onMounted } from 'vue';
+import { sessionState, isLoggedIn, updateUserDetails } from '@/service/useSession';
+import { ref, onMounted, watch } from 'vue';
+import apiClient from "@/plugins/axiosConfig";
 
 // Track whether night mode is active
 const isNightMode = ref(false);
 
-// Function to toggle night mode and save to localStorage
+// Function to toggle night mode
 const toggleNightMode = () => {
-  isNightMode.value = !isNightMode.value; // Toggle the night mode state
-  if (isNightMode.value) {
-    document.body.classList.add('night-mode'); // Apply night mode styles to body
-    localStorage.setItem('night-mode', 'true'); // Save the state to localStorage
-  } else {
-    document.body.classList.remove('night-mode'); // Remove night mode styles from body
-    localStorage.setItem('night-mode', 'false'); // Save the state to localStorage
-  }
+  isNightMode.value = !isNightMode.value;
+  document.body.classList.toggle('night-mode', isNightMode.value);
+  localStorage.setItem('night-mode', isNightMode.value ? 'true' : 'false');
 };
 
-// On page load, check localStorage for the saved night mode state
+// On component mount, check night mode state and fetch user details if logged in
 onMounted(() => {
+  // Restore night mode state
   const savedNightMode = localStorage.getItem('night-mode');
   if (savedNightMode === 'true') {
     isNightMode.value = true;
-    document.body.classList.add('night-mode'); // Apply night mode if it's saved
+    document.body.classList.add('night-mode');
   } else {
     isNightMode.value = false;
-    document.body.classList.remove('night-mode'); // Ensure day mode if not saved
+    document.body.classList.remove('night-mode');
+  }
+
+  // Fetch user details only if logged in
+  if (isLoggedIn.value) {
+    updateUserDetails(apiClient);
   }
 });
 
-// Retrieve username from localStorage
-const username = localStorage.getItem('username');
+const logout = async () => {
+  await logoutUser(); // Calls the logout API
+  window.location.reload(); // Reload the page to clear user state
+};
 
-const displayUsername = computed(() => {
-  if (!username || username === "null null" || !username.trim()) {
-    return ""; // Return fallback message if username is invalid or empty
+const logoutUser = async () => {
+  try {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('username');
+
+  } catch (error) {
+    console.error('Error logging out:', error);
   }
-  return username; // Return the valid username if it exists
+};
+
+// Watch for login state changes to refresh user details dynamically
+watch(isLoggedIn, (newVal) => {
+  if (newVal) {
+    updateUserDetails(apiClient); // Fetch user details on login
+  }
 });
 </script>
 
@@ -138,7 +153,7 @@ const displayUsername = computed(() => {
 
 /* Night mode specific styles */
 body.night-mode .navbar {
-  background-color: #2c3e50; /* Dark background for navbar in night mode */
+  background-color: #0b1218; /* Dark background for navbar in night mode */
 }
 
 body.night-mode .night-mode-toggle {

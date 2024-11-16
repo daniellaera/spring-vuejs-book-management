@@ -3,7 +3,6 @@ package com.daniellaera.backend.config;
 import com.daniellaera.backend.service.impl.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,8 +32,11 @@ public class SecurityConfig {
                         .cors(withDefaults())
                         .csrf(AbstractHttpConfigurer::disable)
                         .authorizeHttpRequests(request -> request
-                                .requestMatchers("/api/v3/auth/**").permitAll()
+                                .requestMatchers("/api/v3/auth/**").permitAll() // Public endpoints
+                                .requestMatchers("/api/v3/auth/me").hasAuthority("USER")
+                                //.requestMatchers("/api/v3/auth/logout").hasAuthority("USER")
                                 .requestMatchers("/api/v3/book/**").permitAll()
+                                .requestMatchers("/api/v3/comment/**").permitAll()
                         )
                         .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                         .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)

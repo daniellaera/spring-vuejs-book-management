@@ -1,5 +1,6 @@
 <template>
   <div class="book-list">
+    <h2 class="book-list-title">Books</h2>
     <div v-if="books.length === 0" class="loading-message">
       <p>Loading books...</p>
     </div>
@@ -19,7 +20,17 @@
           <td>{{ book.title }}</td>
           <td>
             <button @click="goToDetail(book.id)" class="action-btn">Details</button>
-            <button v-if="isLoggedIn" @click="handleCommentClick(book.id)" class="action-btn comment-btn">Comment</button>
+
+            <!-- Comment button with badge showing the number of comments -->
+            <button
+              v-if="isLoggedIn"
+              @click="goToDetail(book.id)"
+              class="action-btn comment-btn">
+              Comment
+              <span v-if="book.comments.length" class="comment-badge">{{ book.comments.length }}</span>
+            </button>
+
+            <!-- Disabled button when user is not logged in -->
             <button v-else class="action-btn comment-btn" disabled>Login to Comment</button>
           </td>
         </tr>
@@ -60,11 +71,6 @@ const fetchBooks = async () => {
 // Adjusted goToDetail to take book.id instead of isbn
 const goToDetail = (id: number) => {
   router.push(`/book/${id}`); // Push bookId to the route
-};
-
-// Handle the comment button click (show modal)
-const handleCommentClick = (id: number) => {
-  showModal.value = true; // Show the modal when comment button is clicked
 };
 
 const closeModal = () => {
@@ -128,6 +134,17 @@ onMounted(() => {
 .comment-btn:disabled {
   background-color: #ddd;
   cursor: not-allowed;
+}
+
+/* Enhanced Badge Styles */
+.comment-badge {
+  background-color: #FF5722; /* Vibrant color */
+  color: white;
+  font-weight: bold;
+  border-radius: 12px;  /* Slightly more rounded corners */
+  padding: 3px 6px;
+  margin-left: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Adding subtle shadow for contrast */
 }
 
 .loading-message {

@@ -5,13 +5,23 @@ import com.daniellaera.backend.dao.request.SignUpRequest;
 import com.daniellaera.backend.dao.request.SigningRequest;
 import com.daniellaera.backend.dao.response.JwtAuthenticationResponse;
 import com.daniellaera.backend.dao.response.RefreshTokenResponse;
+import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.service.AuthenticationService;
 import com.daniellaera.backend.service.RefreshTokenService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v3/auth")
@@ -27,6 +37,24 @@ public class AuthController {
     public void setAuthenticationService(AuthenticationService authenticationService, RefreshTokenService refreshTokenService) {
         this.authenticationService = authenticationService;
         this.refreshTokenService = refreshTokenService;
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(Principal principal) {
+        if (principal != null) {
+            // Get the Authentication object from SecurityContextHolder
+            Authentication authentication = (Authentication) principal;
+            // Extract the UserDetails (your custom User object) from the Authentication object
+            User user = (User) authentication.getPrincipal();
+
+            return ResponseEntity.ok(Map.of(
+                    "username", user.getUsername(),
+                    "fullName", user.getFullName()
+            ));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
+        }
     }
 
     @PostMapping("/signup")
@@ -48,12 +76,6 @@ public class AuthController {
     @PostMapping("/refreshToken")
     public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
         return ResponseEntity.ok(refreshTokenService.generateNewToken(request));
-    }
-
-    @PreAuthorize("hasAuthority('USER')")
-    @GetMapping("/ping")
-    public String test() {
-        return "pong";
     }
 
 }

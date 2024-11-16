@@ -127,7 +127,7 @@ button.btn:hover {
 
 /* Night mode styles */
 body.night-mode .login-form {
-  background-color: #2c3e50; /* Darker background for night mode */
+  background-color: #0b1218; /* Darker background for night mode */
 }
 
 body.night-mode button.btn {

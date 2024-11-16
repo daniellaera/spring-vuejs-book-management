@@ -3,12 +3,14 @@ import { reactive, computed } from 'vue';
 interface SessionState {
   tokenExpiration: number | null;
   timeLeft: number;
+  userDetails: { fullName: string | null }; // Store user details
 }
 
 // Initialize sessionState as a reactive object
 export const sessionState = reactive<SessionState>({
   tokenExpiration: null,
-  timeLeft: 0
+  timeLeft: 0,
+  userDetails: { fullName: null },
 });
 
 // Computed property to check if the user is logged in
@@ -17,17 +19,12 @@ export const isLoggedIn = computed(() => {
 });
 
 // Function to set the token expiration and update the countdown
-export function setTokenExpiration(token: string, username?: string) {
+export function setTokenExpiration(token: string) {
   const expiration = getTokenExpiration(token);
   if (expiration) {
     sessionState.tokenExpiration = expiration;
-    updateCountdown(); // Immediately update the countdown after setting expiration
+    updateCountdown();
     localStorage.setItem('auth_token', token); // Store the token in localStorage
-
-    if (username) {
-      localStorage.setItem('username', username); // Store the username if provided
-    }
-
     startSessionTimer(); // Start a session timer to update countdown
   }
 }
@@ -44,8 +41,8 @@ export function updateCountdown() {
 export function resetSession() {
   sessionState.tokenExpiration = null;
   sessionState.timeLeft = 0;
+  sessionState.userDetails.fullName = null;
   localStorage.removeItem('auth_token'); // Optionally clear the token from localStorage
-  localStorage.removeItem('username');
 }
 
 // Function to parse the token and extract the expiration timestamp (exp)
@@ -62,15 +59,9 @@ function getTokenExpiration(token: string): number | null {
 // Function to check if the user is logged in after page reload
 export function checkSession() {
   const token = localStorage.getItem('auth_token');
-  const username = localStorage.getItem('username');
 
-  // If the token exists in localStorage, try to restore session
   if (token) {
-    if (username) {
-      setTokenExpiration(token, username); // Set the expiration and username if available
-    } else {
-      setTokenExpiration(token); // If no username, still set the expiration
-    }
+    setTokenExpiration(token); // Restore session state
   }
 }
 
@@ -81,13 +72,28 @@ function startSessionTimer() {
     clearInterval(sessionTimer); // Clear any existing timer
   }
 
-  // Update countdown every second
   sessionTimer = setInterval(() => {
-    updateCountdown(); // Update countdown every second
+    updateCountdown();
     if (sessionState.timeLeft <= 0) {
-      clearInterval(sessionTimer!); // Stop the timer once the session has expired
+      clearInterval(sessionTimer!); // Stop the timer once the session expires
       sessionTimer = null;
       resetSession(); // Reset session when the countdown reaches zero
     }
   }, 1000);
+}
+
+// Function to update user details
+export async function updateUserDetails(apiClient: any) {
+  const token = localStorage.getItem('auth_token');
+  if (!token) return;
+
+  try {
+    const response = await apiClient.get('/auth/me', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    sessionState.userDetails.fullName = response.data.fullName; // Update the user details
+  } catch (error) {
+    console.error('Failed to fetch user details:', error);
+    resetSession(); // Reset session on error
+  }
 }

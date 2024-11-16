@@ -1,3 +1,5 @@
+import type {CommentDTO} from "@/model/comment";
+
 export interface BookDTO {
   title: string;
   isbn: string;
@@ -6,4 +8,5 @@ export interface BookDTO {
   userDTO: {
     fullName: string;
   };
+  comments: CommentDTO[];
 }

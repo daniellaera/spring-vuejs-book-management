@@ -22,6 +22,7 @@ watchEffect(() => {
     document.body.classList.remove('night-mode');
   }
 });
+
 // Call checkSession to ensure session is restored on page reload or app load
 onMounted(() => {
   checkSession(); // This restores the session state on app load or refresh
@@ -29,9 +30,18 @@ onMounted(() => {
 </script>
 
 <style>
+/* Importing Google Fonts for Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+/* Apply global font family */
+* {
+  font-family: 'Inter', sans-serif; /* Applies to all elements */
+  margin: 0;
+  padding: 0;
+}
 /* Apply night mode styles globally */
 body.night-mode {
-  background-color: #2c3e50;
+  background-color: #0b1218;
   color: white;
 }
 

@@ -3,6 +3,8 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import apiClient from '@/plugins/axiosConfig';
 import type { BookDTO } from "@/model/book";
+import CommentList from '@/views/CommentList.vue'; // Import the CommentList component
+import CommentForm from '@/components/CommentForm.vue'; // Import the CommentForm component
 
 const book = ref<BookDTO | null>(null);
 const route = useRoute();
@@ -48,6 +50,12 @@ const goBack = () => {
     <p><strong>Author:</strong> {{ book.userDTO.fullName }}</p>
     <p><strong>Description:</strong> {{ book.description }}</p>
 
+    <!-- Render the CommentList component and pass comments -->
+    <CommentList :comments="book.comments" />
+
+    <!-- Render the CommentForm to submit a new comment -->
+    <CommentForm :bookId="book.id" @comment-added="fetchBookDetails(book.id)" />
+
     <!-- Back button placed under the book details -->
     <button @click="goBack" class="back-btn">Back to books</button>
   </div>
@@ -71,27 +79,6 @@ const goBack = () => {
   margin-bottom: 8px;
 }
 
-.comments-section {
-  margin-top: 20px;
-}
-
-.comments-section h3 {
-  font-size: 1.5rem;
-}
-
-.comments-section ul {
-  list-style-type: none;
-  padding-left: 0;
-}
-
-.comments-section li {
-  font-size: 1rem;
-  margin-bottom: 5px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
-}
-
-/* Styling for the back button below the details */
 .back-btn {
   background-color: #4CAF50;
   color: white;
@@ -100,10 +87,10 @@ const goBack = () => {
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  margin-top: 20px; /* Adjusted margin to place it below content */
-  display: block;  /* Make sure the button is block-level and takes full width */
+  margin-top: 20px;
+  display: block;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center; /* Centers the text inside the button */
+  text-align: center;
 }
 
 .back-btn:hover {
