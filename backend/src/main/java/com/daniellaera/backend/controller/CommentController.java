@@ -36,7 +36,7 @@ public class CommentController {
             @RequestBody CommentDTO commentDTO,
             @AuthenticationPrincipal User currentUser // Get the logged-in user
     )  {
-        if (currentUser == null) {
+        if (currentUser.getEmail() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
