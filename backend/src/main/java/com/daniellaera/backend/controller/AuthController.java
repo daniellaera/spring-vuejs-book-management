@@ -101,6 +101,10 @@ public class AuthController {
                 String email = (userResponse.getBody().get("email") != null) ? userResponse.getBody().get("email").toString() : "no-email-found";
                 String username = (userResponse.getBody().get("name") != null) ? userResponse.getBody().get("name").toString() : "no-username-found";
 
+                if ("no-username-found".equals(username)) {
+                    username = "GITHUB USER";
+                }
+
                 try {
                     JwtAuthenticationResponse jwtResponse = authenticationService.signupOrSigninWithGitHub(email, username);
                     return ResponseEntity.ok(Collections.singletonMap("token", jwtResponse.getToken()));
