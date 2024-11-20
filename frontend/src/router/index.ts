@@ -8,6 +8,11 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/login/oauth2/code/github',
+      name: 'OAuthCallback',
+      component: () => import('@/views/OAuthCallback.vue')
+    },
+    {
       path: '/',
       name: 'home',
       component: HomeView,

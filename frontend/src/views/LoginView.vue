@@ -20,6 +20,14 @@
         <p>{{ errorMessage }}</p>
       </div>
 
+      <div class="oauth-buttons">
+        <p>Or log in with:</p>
+        <button @click="redirectToGithubOAuth" type="button" class="btn oauth-btn">
+          <img src="/assets/github-icon.svg" alt="GitHub Icon" class="github-icon" style="margin-right: 8px;" />
+          GitHub
+        </button>
+      </div>
+
       <div class="register-link">
         <p>Don't have an account? <RouterLink to="/signup">Register</RouterLink></p>
       </div>
@@ -57,29 +65,37 @@ export default defineComponent({
 
         await router.push('/');
 
-        // Clear error message if login is successful
-        errorMessage.value = null;
-
+        errorMessage.value = null; // Clear error message if login is successful
       } catch (error: any) {
         console.error('Login Failed', error);
 
         if (error.response) {
-          // If the response contains a message (like "Invalid username or password")
           errorMessage.value = error.response.data || 'An error occurred. Please try again.';
         } else {
           errorMessage.value = 'An unknown error occurred. Please try again.';
         }
 
-        // Clear the local storage on failed login attempt
-        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_token'); // Clear the local storage on failed login attempt
         localStorage.removeItem('username');
       }
+    };
+
+    const redirectToGithubOAuth = () => {
+      const githubOAuthUrl = 'https://github.com/login/oauth/authorize';
+      const clientId = 'Ov23liqqh9FZ0UUwvBwA'; // Your GitHub OAuth2 client ID
+      const redirectUri = 'http://localhost:5173/login/oauth2/code/github'; // Matches GitHub app settings
+      const scope = 'read:user user:email';
+
+      window.location.href = `${githubOAuthUrl}?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+        redirectUri
+      )}&scope=${encodeURIComponent(scope)}`;
     };
 
     return {
       loginData,
       handleLogin,
-      errorMessage
+      errorMessage,
+      redirectToGithubOAuth
     };
   }
 });
@@ -183,5 +199,36 @@ body.night-mode button.btn:hover {
   color: red;
   text-align: center;
   margin-top: 1rem;
+}
+
+.oauth-buttons {
+  text-align: center; /* Center content horizontally */
+  margin-top: 1.5rem; /* Add spacing above the section */
+}
+
+.oauth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Ensure icon and text are centered within the button */
+  padding: 10px 15px;
+  font-size: 16px;
+  background-color: #24292f;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: auto; /* Ensure button size adjusts to its content */
+  margin: 0 auto; /* Center the button horizontally */
+}
+
+.oauth-btn:hover {
+  background-color: #444d56;
+}
+
+.github-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px; /* Spacing between icon and text */
 }
 </style>

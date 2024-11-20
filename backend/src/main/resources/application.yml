@@ -10,9 +10,15 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_SECRET}
 jwt:
-  secret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
+  secret: ${JWT_SECRET}
   expiration: 86400000
   jwtRefreshExpirationMs: 86400000
 

@@ -10,4 +10,6 @@ public interface AuthenticationService {
     JwtAuthenticationResponse signup(SignUpRequest request);
 
     JwtAuthenticationResponse signing(SigningRequest request);
+
+    JwtAuthenticationResponse signupOrSigninWithGitHub(String email, String username);
 }

@@ -3,7 +3,9 @@ package com.daniellaera.backend.config;
 import com.daniellaera.backend.service.impl.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,22 +27,43 @@ public class SecurityConfig {
         return new JwtAuthFilter();
     }
 
+    //@Bean
+    //@Order(1)
+    //public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    //    return
+    //            http
+    //                    .cors(withDefaults())
+    //                    .csrf(AbstractHttpConfigurer::disable)
+    //                    .authorizeHttpRequests(request -> request
+    //                            .requestMatchers("/api/v3/auth/**").permitAll() // Public endpoints
+    //                            .requestMatchers("/api/v3/auth/me").hasAuthority("USER")
+    //                            //.requestMatchers("/api/v3/auth/logout").hasAuthority("USER")
+    //                            .requestMatchers("/api/v3/book/**").permitAll()
+    //                            .requestMatchers("/api/v3/comment/**").permitAll()
+    //                    )
+    //                    .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    //                    .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
+    //                    .build();
+    //}
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return
-                http
-                        .cors(withDefaults())
-                        .csrf(AbstractHttpConfigurer::disable)
-                        .authorizeHttpRequests(request -> request
-                                .requestMatchers("/api/v3/auth/**").permitAll() // Public endpoints
-                                .requestMatchers("/api/v3/auth/me").hasAuthority("USER")
-                                //.requestMatchers("/api/v3/auth/logout").hasAuthority("USER")
-                                .requestMatchers("/api/v3/book/**").permitAll()
-                                .requestMatchers("/api/v3/comment/**").permitAll()
-                        )
-                        .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                        .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
-                        .build();
+    //@Order(0)
+    public SecurityFilterChain securityFilterChainOauth2(HttpSecurity http) throws Exception {
+        return http
+                .cors(withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v3/auth/**").permitAll() // Public endpoints
+                        .requestMatchers("/api/v3/auth/me").hasAuthority("USER")
+                        //.requestMatchers("/api/v3/auth/logout").hasAuthority("USER")
+                        .requestMatchers("/api/v3/book/**").permitAll()
+                        .requestMatchers("/api/v3/comment/**").permitAll()
+                )
+                .oauth2Login(Customizer.withDefaults())
+                .formLogin(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class) // Add JwtAuthFilter
+                .build();
     }
 
     @Bean

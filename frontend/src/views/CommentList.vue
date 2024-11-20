@@ -9,6 +9,17 @@ defineProps({
     required: true,
   },
 });
+
+const getFullName = (comment: CommentDTO) => {
+  const userFullName = comment.authorFullName
+
+  if (userFullName === "null null") {
+    return '- Guest';
+  }
+
+  return '- ' + userFullName;
+};
+
 </script>
 
 <template>
@@ -25,7 +36,7 @@ defineProps({
     <ul v-if="comments && comments.length > 0">
       <li v-for="(comment, index) in comments" :key="index">
         <q class="quote-style">{{ comment.content }}</q>
-        <span class="author-name"> - {{ comment.authorFullName }}</span>
+        <span class="author-name"> {{ getFullName(comment) }}</span>
       </li>
     </ul>
   </div>

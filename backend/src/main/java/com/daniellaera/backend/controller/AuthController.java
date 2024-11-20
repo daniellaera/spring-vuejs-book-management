@@ -9,21 +9,31 @@ import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.service.AuthenticationService;
 import com.daniellaera.backend.service.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v3/auth")
 public class AuthController {
 
+    @Value("${spring.security.oauth2.client.registration.github.client-id}")
+    private String githubClientId;
+    @Value("${spring.security.oauth2.client.registration.github.client-secret}")
+    private String githubClientSecret;
+
     // check this out
     // https://medium.com/spring-boot/spring-boot-3-spring-security-6-jwt-authentication-authorization-98702d6313a5
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     private AuthenticationService authenticationService;
     private RefreshTokenService refreshTokenService;
@@ -32,6 +42,69 @@ public class AuthController {
     public void setAuthenticationService(AuthenticationService authenticationService, RefreshTokenService refreshTokenService) {
         this.authenticationService = authenticationService;
         this.refreshTokenService = refreshTokenService;
+    }
+
+    @PostMapping("/github/callback")
+    public ResponseEntity<?> handleGitHubCallback(@RequestBody Map<String, String> requestBody) {
+        String code = requestBody.get("code");
+
+        if (code == null || code.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Authorization code is required");
+        }
+
+        System.out.println("Received GitHub callback with code: " + code);
+
+        // Exchange the code for an access token
+        String tokenEndpoint = "https://github.com/login/oauth/access_token";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+        Map<String, String> body = new HashMap<>();
+        body.put("client_id", githubClientId);
+        body.put("client_secret", githubClientSecret);
+        body.put("code", code);
+
+        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<Map> response = restTemplate.postForEntity(tokenEndpoint, requestEntity, Map.class);
+
+        if (response.getBody() != null && response.getBody().containsKey("access_token")) {
+            String accessToken = response.getBody().get("access_token").toString();
+
+            // Fetch user details from GitHub API
+            ResponseEntity<Map> userResponse = restTemplate.exchange(
+                    "https://api.github.com/user",
+                    HttpMethod.GET,
+                    new HttpEntity<>(createAuthHeaders(accessToken)),
+                    Map.class
+            );
+
+            if (userResponse.getBody() != null) {
+                // Safely extract email and username from the response
+                String email = (userResponse.getBody().get("email") != null) ? userResponse.getBody().get("email").toString() : "no-email-found";
+                String username = (userResponse.getBody().get("name") != null) ? userResponse.getBody().get("name").toString() : "no-username-found";
+
+                // Attempt to sign up or sign in the user
+                try {
+                    // Check if the user exists using their email (or username)
+                    JwtAuthenticationResponse jwtResponse = authenticationService.signupOrSigninWithGitHub(email, username);
+
+                    // Return the JWT token response
+                    return ResponseEntity.ok(Collections.singletonMap("token", jwtResponse.getToken()));
+                } catch (IllegalArgumentException e) {
+                    // In case of errors like user already existing, return a conflict
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("GitHub user already exists with email: " + email);
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("GitHub authentication failed");
+    }
+
+    private HttpHeaders createAuthHeaders(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        return headers;
     }
 
     @PreAuthorize("hasAuthority('USER')")

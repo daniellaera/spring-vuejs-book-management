@@ -15,7 +15,7 @@
       Time left in session: {{ sessionState.timeLeft }} seconds
     </div>
     <div v-else-if="!isLoggedIn || sessionState.timeLeft <= 0" class="session-expired">
-      Your session has expired. Please log in again.
+      You are not authenticated. Please log in.
     </div>
 
     <!-- Night mode toggle button -->
