@@ -6,6 +6,7 @@ spring:
           github:
             client-id: Ov23liqqh9FZ0UUwvBwA
             client-secret: bbd4e12658af08f1d780afcbe7655d2c95843a8d
+            redirect-uri: http://localhost:5173/login/oauth2/code/github
 
 frontend:
   url: http://localhost:5173/
