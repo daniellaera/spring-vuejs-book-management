@@ -29,6 +29,8 @@ public class AuthController {
     private String githubClientId;
     @Value("${spring.security.oauth2.client.registration.github.client-secret}")
     private String githubClientSecret;
+    @Value("${spring.security.oauth2.client.registration.github.redirect-uri}")
+    private String redirectUri;
 
     // check this out
     // https://medium.com/spring-boot/spring-boot-3-spring-security-6-jwt-authentication-authorization-98702d6313a5
@@ -42,6 +44,21 @@ public class AuthController {
     public void setAuthenticationService(AuthenticationService authenticationService, RefreshTokenService refreshTokenService) {
         this.authenticationService = authenticationService;
         this.refreshTokenService = refreshTokenService;
+    }
+
+    @GetMapping("/github/login")
+    public ResponseEntity<Map<String, String>> redirectToGithubOAuth() {
+        // Construct the GitHub OAuth URL
+        String authorizationUrl = "https://github.com/login/oauth/authorize"
+                + "?client_id=" + githubClientId
+                + "&redirect_uri=" + redirectUri
+                + "&scope=user:email"; // Optional: Add any required scope
+
+        // Send the URL back to the frontend so it can redirect the user
+        Map<String, String> response = new HashMap<>();
+        response.put("authUrl", authorizationUrl);
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/github/callback")
@@ -64,6 +81,7 @@ public class AuthController {
         body.put("client_id", githubClientId);
         body.put("client_secret", githubClientSecret);
         body.put("code", code);
+        body.put("redirect_uri", redirectUri);  // Make sure this matches the one used in the GitHub authorization request
 
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(body, headers);
         ResponseEntity<Map> response = restTemplate.postForEntity(tokenEndpoint, requestEntity, Map.class);
@@ -80,19 +98,13 @@ public class AuthController {
             );
 
             if (userResponse.getBody() != null) {
-                // Safely extract email and username from the response
                 String email = (userResponse.getBody().get("email") != null) ? userResponse.getBody().get("email").toString() : "no-email-found";
                 String username = (userResponse.getBody().get("name") != null) ? userResponse.getBody().get("name").toString() : "no-username-found";
 
-                // Attempt to sign up or sign in the user
                 try {
-                    // Check if the user exists using their email (or username)
                     JwtAuthenticationResponse jwtResponse = authenticationService.signupOrSigninWithGitHub(email, username);
-
-                    // Return the JWT token response
                     return ResponseEntity.ok(Collections.singletonMap("token", jwtResponse.getToken()));
                 } catch (IllegalArgumentException e) {
-                    // In case of errors like user already existing, return a conflict
                     return ResponseEntity.status(HttpStatus.CONFLICT).body("GitHub user already exists with email: " + email);
                 }
             }

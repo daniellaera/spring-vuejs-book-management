@@ -81,14 +81,15 @@ export default defineComponent({
     };
 
     const redirectToGithubOAuth = () => {
-      const githubOAuthUrl = 'https://github.com/login/oauth/authorize';
-      const clientId = 'Ov23liqqh9FZ0UUwvBwA'; // Your GitHub OAuth2 client ID
-      const redirectUri = 'http://localhost:5173/login/oauth2/code/github'; // Matches GitHub app settings
-      const scope = 'read:user user:email';
-
-      window.location.href = `${githubOAuthUrl}?client_id=${clientId}&redirect_uri=${encodeURIComponent(
-        redirectUri
-      )}&scope=${encodeURIComponent(scope)}`;
+      // Make a request to your backend to start the OAuth process
+      apiClient.get('/auth/github/login')
+        .then(response => {
+          // This will redirect the user to GitHub's authorization page
+          window.location.href = response.data.authUrl; // The backend should send this URL
+        })
+        .catch(error => {
+          console.error('GitHub OAuth redirect failed', error);
+        });
     };
 
     return {

@@ -17,6 +17,7 @@ spring:
           github:
             client-id: ${GITHUB_CLIENT_ID}
             client-secret: ${GITHUB_SECRET}
+            redirect-uri: ${GITHUB_REDIRECT_URI}
 jwt:
   secret: ${JWT_SECRET}
   expiration: 86400000
