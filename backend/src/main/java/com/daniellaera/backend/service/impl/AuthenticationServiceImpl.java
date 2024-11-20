@@ -81,19 +81,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public JwtAuthenticationResponse signupOrSigninWithGitHub(String email, String username) {
-        // Check if the user already exists in the database using the GitHub email
         Optional<User> existingUser = userRepository.findByEmail(email);
 
         if (existingUser.isPresent()) {
             log.info("User with email '{}' already exists", email);
             log.info("Login the user and creating a JWT token");
-            // User exists, perform sign-in
+
             User user = existingUser.get();
-            // Generate JWT token for the user
             String token = jwtService.generateToken(user.getUsername(), "USER");
-            // Generate a refresh token for the user
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-            // Return the JWT and refresh token in the response
             return JwtAuthenticationResponse
                     .builder()
                     .token(token)
@@ -103,28 +99,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } else {
             log.info("User with email '{}' does not exists", email);
             log.info("Signup the user and creating a JWT token");
-            // User does not exist, perform sign-up manually using GitHub details
-            String[] nameParts = username.split(" ", 2); // Split into first and last name
-            String firstName = nameParts[0];  // First part as first name
+
+            String[] nameParts = username.split(" ", 2);
+            String firstName = nameParts[0];
             String lastName = nameParts[1];
             User newUser = User.builder()
-                    .email(email)         // Use the GitHub email
-                    .firstName(firstName)   // Default first name, can be replaced with actual GitHub user data if needed
-                    .lastName(lastName)      // Default last name, can be replaced with actual GitHub user data if needed
-                    .password(passwordEncoder.encode("temporarypassword"))  // Set a temporary password, can later be updated
-                    .role(Role.USER)       // Set the role as "USER"
+                    .email(email)
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .password(passwordEncoder.encode("temporarypassword"))  // todo should we tell the user its temporary password somehow?
+                    .role(Role.USER)
                     .build();
 
-            // Save the new user in the database
             userRepository.save(newUser);
 
-            // Generate JWT token for the new user
             String token = jwtService.generateToken(newUser.getUsername(), newUser.getRole().toString());
 
-            // Generate a refresh token for the new user
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(newUser.getId());
 
-            // Return the JWT and refresh token in the response
             return JwtAuthenticationResponse
                     .builder()
                     .token(token)

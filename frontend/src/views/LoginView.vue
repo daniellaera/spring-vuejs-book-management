@@ -206,29 +206,39 @@ body.night-mode button.btn:hover {
   margin-top: 1.5rem; /* Add spacing above the section */
 }
 
+/* Ensure GitHub OAuth button gets the correct styling */
 .oauth-btn {
   display: flex;
   align-items: center;
-  justify-content: center; /* Ensure icon and text are centered within the button */
+  justify-content: center;
   padding: 10px 15px;
   font-size: 16px;
-  background-color: #24292f;
-  color: #ffffff;
+  background-color: #0366d6; /* GitHub blue */
+  color: #ffffff; /* White text */
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  width: auto; /* Ensure button size adjusts to its content */
-  margin: 0 auto; /* Center the button horizontally */
+  width: auto;
+  margin: 0 auto;
 }
 
 .oauth-btn:hover {
-  background-color: #444d56;
+  background-color: #0288d1; /* Slightly darker blue on hover */
 }
 
 .github-icon {
   display: inline-block;
   vertical-align: middle;
   margin-right: 8px; /* Spacing between icon and text */
+}
+
+/* Additional styling to make sure no interference from other button styles */
+button[type="submit"].btn {
+  background-color: #27ae60 !important; /* Green background for submit button */
+}
+
+button[type="button"].btn.oauth-btn {
+  background-color: #0366d6 !important; /* GitHub blue background */
 }
 </style>
