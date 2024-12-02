@@ -32,6 +32,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -100,8 +101,9 @@ public class CommentControllerIT {
         book = new Book();
         book.setTitle("Test Book");
         book.setDescription("A book for testing comments.");
-        book.setIsbn("TEST-ISBN");
-        book.setAuthor(user);
+        book.setIsbn("978-1234567890");
+        book.setAuthor("Thomas H. Cormen");
+        book.setGenre("Fiction");
         bookRepository.save(book);
 
         Comment comment1 = new Comment();
@@ -115,6 +117,8 @@ public class CommentControllerIT {
         comment2.setUser(user);
 
         commentRepository.saveAll(Arrays.asList(comment1, comment2));
+
+        assertNotNull(book.getId());
     }
 
     @Test
@@ -151,7 +155,7 @@ public class CommentControllerIT {
                 .thenReturn(newComment);
 
         // Act: Perform the POST request with JWT token in the Authorization header
-        mockMvc.perform(post("/api/v3/comment/{bookId}", 7)
+        mockMvc.perform(post("/api/v3/comment/{bookId}", book.getId())
                         .contentType("application/json")
                         .accept("application/json")
                         .content(newCommentJson)

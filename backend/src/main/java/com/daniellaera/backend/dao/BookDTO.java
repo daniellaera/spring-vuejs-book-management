@@ -10,6 +10,7 @@ public class BookDTO {
     private String title;
     private String isbn;
     private String description;
-    private UserDTO userDTO;
+    private String author;
+    private String genre;
     private List<CommentDTO> comments;
 }

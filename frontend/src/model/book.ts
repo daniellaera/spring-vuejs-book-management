@@ -5,8 +5,7 @@ export interface BookDTO {
   isbn: string;
   id: number;
   description: string;
-  userDTO: {
-    fullName: string;
-  };
+  author: string;
+  genre: string;
   comments: CommentDTO[];
 }

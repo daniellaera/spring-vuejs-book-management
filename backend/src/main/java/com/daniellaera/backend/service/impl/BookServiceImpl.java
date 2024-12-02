@@ -2,16 +2,13 @@ package com.daniellaera.backend.service.impl;
 
 import com.daniellaera.backend.dao.BookDTO;
 import com.daniellaera.backend.dao.CommentDTO;
-import com.daniellaera.backend.dao.UserDTO;
 import com.daniellaera.backend.model.Book;
 import com.daniellaera.backend.model.Comment;
-import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.repository.BookRepository;
 import com.daniellaera.backend.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,6 +42,8 @@ public class BookServiceImpl implements BookService {
         bookDto.setDescription(book.getDescription());
         bookDto.setTitle(book.getTitle());
         bookDto.setIsbn(book.getIsbn());
+        bookDto.setAuthor(book.getAuthor());
+        bookDto.setGenre(book.getGenre());
         List<CommentDTO> commentDTOList =
                 (book.getComments() != null) ? book.getComments()
                         .stream()
@@ -52,8 +51,6 @@ public class BookServiceImpl implements BookService {
                         .toList() : List.of();
         bookDto.setComments(commentDTOList);
 
-        UserDTO userDto = convertUserEntityToUserDto(book.getAuthor());
-        bookDto.setUserDTO(userDto);
 
         return bookDto;
     }
@@ -63,11 +60,5 @@ public class BookServiceImpl implements BookService {
         commentDto.setContent(comment.getContent());
         commentDto.setAuthorFullName(comment.getUser().getFullName());
         return commentDto;
-    }
-
-    private UserDTO convertUserEntityToUserDto(User author) {
-        UserDTO userDto = new UserDTO();
-        userDto.setFullName(author.getFullName());
-        return userDto;
     }
 }

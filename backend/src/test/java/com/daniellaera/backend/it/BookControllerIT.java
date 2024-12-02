@@ -60,30 +60,32 @@ public class BookControllerIT {
 
     @Autowired
     private BookRepository bookRepository;
-    @Autowired
-    private UserRepository userRepository;
+    //@Autowired
+    //private UserRepository userRepository;
 
     @BeforeEach
     void setup() {
         bookRepository.deleteAll();
-        userRepository.deleteAll();
-        User user = new User();
-        user.setEmail("john.doe@example.com");
-        user.setPassword("password");
-        user.setRole(Role.USER);
-        userRepository.save(user);
+       // userRepository.deleteAll();
+        //User user = new User();
+        //user.setEmail("john.doe@example.com");
+        //user.setPassword("password");
+        //user.setRole(Role.USER);
+       // userRepository.save(user);
 
         Book book1 = new Book();
         book1.setTitle("Title 1");
         book1.setDescription("Description 1");
-        book1.setIsbn("ISBN 1");
-        book1.setAuthor(user);
+        book1.setIsbn("978-1234567890");
+        book1.setAuthor("Thomas H. Cormen");
+        book1.setGenre("Fiction");
 
         Book book2 = new Book();
         book2.setTitle("Title 2");
         book2.setDescription("Description 2");
-        book2.setIsbn("ISBN 2");
-        book2.setAuthor(user);
+        book2.setIsbn("978-0262033848");
+        book2.setAuthor("Joshua Bloch");
+        book2.setGenre("Programming");
 
         bookRepository.saveAll(Arrays.asList(book1, book2));
     }

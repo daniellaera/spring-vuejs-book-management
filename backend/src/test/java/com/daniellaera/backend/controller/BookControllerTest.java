@@ -49,13 +49,15 @@ public class BookControllerTest {
         bookDTO.setIsbn("123456789");
         bookDTO.setTitle("Title");
         bookDTO.setDescription("Description");
-        bookDTO.setUserDTO(userDTO);
+        bookDTO.setAuthor("Thomas H. Cormen");
+        bookDTO.setGenre("Fiction");
 
         BookDTO bookDTO2 = new BookDTO();
         bookDTO2.setIsbn("123456789");
         bookDTO2.setTitle("Title");
         bookDTO2.setDescription("Description");
-        bookDTO2.setUserDTO(userDTO);
+        bookDTO2.setAuthor("Thomas H. Cormen");
+        bookDTO2.setGenre("Fiction");
 
         List<BookDTO> bookDTOList = Arrays.asList(bookDTO, bookDTO2);
         given(bookService.getAllBooks()).willReturn(bookDTOList);

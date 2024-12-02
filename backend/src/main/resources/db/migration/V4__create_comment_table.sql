@@ -10,27 +10,74 @@ CREATE TABLE _comment
 );
 
 -- Step 2: Insert initial comments for existing books
--- Adding comments for the book 'Spring Boot Basics' (book_id = 1)
--- Assume user_id for each comment
+-- Comments for 'Spring Boot Essentials' (book_id = 1)
 INSERT INTO _comment (content, book_id, user_id)
 VALUES
-    ('Excellent book for beginners!', 1, 1),  -- User 1
-    ('Helped me start with Spring Boot.', 1, 2); -- User 2
+    ('Excellent book for beginners!', 1, 1),
+    ('Helped me start with Spring Boot.', 1, 2),
+    ('Very practical and easy to follow.', 1, 4); -- User 4 adds one comment
 
--- Adding comments for the book 'Advanced Java Programming' (book_id = 2)
+-- Comments for 'Clean Code' (book_id = 2)
 INSERT INTO _comment (content, book_id, user_id)
 VALUES
-    ('Very detailed and insightful.', 2, 2),  -- User 2
-    ('Perfect for experienced developers.', 2, 3); -- User 3
+    ('Changed the way I write code forever.', 2, 1),
+    ('A must-read for every developer.', 2, 2),
+    ('Great insights on writing clean code.', 2, 3);
 
--- Adding comments for the book 'Data structures and Algorithms' (book_id = 3)
+-- Comments for 'Effective Java' (book_id = 3)
 INSERT INTO _comment (content, book_id, user_id)
 VALUES
-    ('Clear explanations of algorithms.', 3, 3),  -- User 3
-    ('Great reference for coding interviews.', 3, 4); -- User 4
+    ('The best Java guide I have ever read.', 3, 1),
+    ('Invaluable for understanding Java best practices.', 3, 2),
+    ('A great book for serious Java developers.', 3, 4); -- User 4 adds one comment
 
--- Adding comments for the book 'Spring 6 and Boot 3' (book_id = 4)
+-- Comments for 'The Pragmatic Programmer' (book_id = 4)
 INSERT INTO _comment (content, book_id, user_id)
 VALUES
-    ('Comprehensive Spring coverage.', 4, 4),  -- User 4
-    ('Loved the practical examples.', 4, 1); -- User 1
+    ('An inspiring read for programmers.', 4, 1),
+    ('Packed with practical advice.', 4, 3),
+    ('Encourages thinking outside the box.', 4, 2);
+
+-- Comments for 'To Kill a Mockingbird' (book_id = 5)
+INSERT INTO _comment (content, book_id, user_id)
+VALUES
+    ('A touching and profound novel.', 5, 3),
+    ('Addresses important social issues.', 5, 2),
+    ('A timeless masterpiece.', 5, 1),
+    ('Beautifully written prose.', 5, 4); -- User 4 adds one comment
+
+-- Comments for '1984' (book_id = 6)
+INSERT INTO _comment (content, book_id, user_id)
+VALUES
+    ('A chilling depiction of a dystopian world.', 6, 2),
+    ('Made me think about the future.', 6, 3),
+    ('George Orwell at his best.', 6, 1);
+
+-- Comments for 'The Great Gatsby' (book_id = 7)
+INSERT INTO _comment (content, book_id, user_id)
+VALUES
+    ('Beautifully written.', 7, 3),
+    ('Captures the spirit of the Jazz Age.', 7, 1),
+    ('A classic that everyone should read.', 7, 2);
+
+-- Comments for 'Introduction to Algorithms' (book_id = 8)
+INSERT INTO _comment (content, book_id, user_id)
+VALUES
+    ('Essential for understanding algorithms.', 8, 1),
+    ('Complex but rewarding.', 8, 3);
+
+-- Comments for 'Artificial Intelligence: A Modern Approach' (book_id = 9)
+INSERT INTO _comment (content, book_id, user_id)
+VALUES
+    ('The definitive guide to AI.', 9, 2),
+    ('Covers all the key AI concepts.', 9, 3),
+    ('Perfect for students and professionals alike.', 9, 1),
+    ('Great reference for deep learning.', 9, 4); -- User 4 adds one comment
+
+-- Comments for 'The Alchemist' (book_id = 10)
+INSERT INTO _comment (content, book_id, user_id)
+VALUES
+    ('A magical and inspiring tale.', 10, 3),
+    ('Teaches important life lessons.', 10, 1),
+    ('Paulo Coelho’s masterpiece.', 10, 2),
+    ('A beautifully crafted story.', 10, 4); -- User 4 adds one comment

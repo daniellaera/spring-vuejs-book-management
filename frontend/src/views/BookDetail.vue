@@ -47,7 +47,8 @@ const goBack = () => {
   <div v-if="book" class="book-detail">
     <h1>{{ book.title }}</h1>
     <p><strong>ISBN:</strong> {{ book.isbn }}</p>
-    <p><strong>Author:</strong> {{ book.userDTO.fullName }}</p>
+    <p><strong>Author:</strong> {{ book.author }}</p>
+    <p><strong>Genre:</strong> {{ book.genre }}</p>
     <p><strong>Description:</strong> {{ book.description }}</p>
 
     <!-- Render the CommentList component and pass comments -->

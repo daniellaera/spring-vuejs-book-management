@@ -20,6 +20,7 @@ onMounted(async () => {
   if (!code) {
     console.error('No authorization code found in URL.');
     await router.push('/login'); // Redirect to login if no code is found
+    // https://stackoverflow.com/questions/64960385/how-can-i-setup-login-with-spring-security-and-vue-js
     return;
   }
 

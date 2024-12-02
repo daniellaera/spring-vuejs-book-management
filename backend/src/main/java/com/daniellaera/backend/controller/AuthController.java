@@ -72,6 +72,8 @@ public class AuthController {
         System.out.println("Received GitHub callback with code: " + code);
 
         // Exchange the code for an access token
+        // https://stackoverflow.com/questions/64960385/how-can-i-setup-login-with-spring-security-and-vue-js
+
         String tokenEndpoint = "https://github.com/login/oauth/access_token";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
