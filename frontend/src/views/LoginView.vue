@@ -1,33 +1,82 @@
 <template>
   <div class="login-form">
-    <form @submit.prevent="handleLogin">
+    <form @submit.prevent="handleLogin" class="flex flex-col gap-4">
       <h2>Login</h2>
 
+      <!-- Email Input -->
       <div class="form-group">
         <label for="email">Email</label>
-        <input v-model="loginData.email" type="email" id="email" placeholder="Enter your email" required />
+        <InputText
+          v-model="loginData.email"
+          type="email"
+          id="email"
+          placeholder="Enter your email"
+          @input="validateForm"
+        required
+        :class="{'p-invalid': errors.email}"
+        />
+        <Message
+          v-if="errors.email"
+          severity="error"
+          size="small"
+          variant="simple"
+        >
+          {{ errors.email }}
+        </Message>
       </div>
 
+      <!-- Password Input -->
       <div class="form-group">
         <label for="password">Password</label>
-        <input v-model="loginData.password" type="password" id="password" placeholder="Enter your password" required />
+        <InputText
+          v-model="loginData.password"
+          type="password"
+          id="password"
+          placeholder="Enter your password"
+          @input="validateForm"
+        required
+        :class="{'p-invalid': errors.password}"
+        />
+        <Message
+          v-if="errors.password"
+          severity="error"
+          size="small"
+          variant="simple"
+        >
+          {{ errors.password }}
+        </Message>
       </div>
 
-      <button type="submit" class="btn">Login</button>
+      <PrimeButton
+        type="submit"
+        label="Login"
+        class="btn"
+        :disabled="!loginData.email || !loginData.password || !!errors.email || !!errors.password"
+      />
 
-      <!-- Show error message if login failed -->
-      <div v-if="errorMessage" class="error-message">
-        <p>{{ errorMessage }}</p>
-      </div>
+      <!-- Error Message (if login fails) -->
+      <Message
+        v-if="errorMessage"
+        severity="error"
+        text="{{ errorMessage }}"
+        class="error-message"
+      />
 
+      <!-- OAuth Login Options -->
       <div class="oauth-buttons">
         <p>Or log in with:</p>
-        <button @click="redirectToGithubOAuth" type="button" class="btn oauth-btn">
-          <img src="/assets/github-icon.svg" alt="GitHub Icon" class="github-icon" style="margin-right: 8px;" />
-          GitHub
-        </button>
+        <PrimeButton
+          @click="redirectToGithubOAuth"
+          type="button"
+          label="GitHub"
+          class="oauth-btn"
+        >
+          <img src="/assets/github-icon.svg" alt="GitHub Icon" class="github-icon" />
+          Login with GitHub
+        </PrimeButton>
       </div>
 
+      <!-- Register Link -->
       <div class="register-link">
         <p>Don't have an account? <RouterLink to="/signup">Register</RouterLink></p>
       </div>
@@ -37,12 +86,20 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import apiClient from '@/plugins/axiosConfig';
+import InputText from 'primevue/inputtext';
+import PrimeButton from 'primevue/button';
+import Message from 'primevue/message';
 import { useRouter } from 'vue-router';
+import apiClient from '@/plugins/axiosConfig';
 import { setTokenExpiration } from '@/service/useSession';
 
 export default defineComponent({
   name: 'LoginView',
+  components: {
+    InputText,
+    PrimeButton,
+    Message,
+  },
   setup() {
     const router = useRouter();
 
@@ -51,41 +108,54 @@ export default defineComponent({
       password: ''
     });
 
-    const errorMessage = ref<string | null>(null);  // Reactive error message
+    const errorMessage = ref<string | null>(null);
+    const errors = ref({
+      email: '',
+      password: ''
+    });
 
+    // Form validation logic
+    const validateForm = () => {
+      errors.value.email = !loginData.value.email
+        ? 'Email is required.'
+        : !/\S+@\S+\.\S+/.test(loginData.value.email)
+          ? 'Invalid email format.'
+          : '';
+
+      errors.value.password = !loginData.value.password ? 'Password is required.' : '';
+    };
+
+    // Form submission handler
     const handleLogin = async () => {
-      try {
-        const response = await apiClient.post('/auth/signin', loginData.value);
-        const token = response.data.token;
-        const user = response.data.username;
+      validateForm();
 
-        localStorage.setItem('auth_token', token);
-        localStorage.setItem('username', user);
-        setTokenExpiration(token);
+      if (!errors.value.email && !errors.value.password) {
+        try {
+          const response = await apiClient.post('/auth/signin', loginData.value);
+          const token = response.data.token;
+          const user = response.data.username;
 
-        await router.push('/');
+          localStorage.setItem('auth_token', token);
+          localStorage.setItem('username', user);
+          setTokenExpiration(token);
 
-        errorMessage.value = null; // Clear error message if login is successful
-      } catch (error: any) {
-        console.error('Login Failed', error);
-
-        if (error.response) {
-          errorMessage.value = error.response.data || 'An error occurred. Please try again.';
-        } else {
-          errorMessage.value = 'An unknown error occurred. Please try again.';
+          await router.push('/');
+          errorMessage.value = null; // Clear error message if login is successful
+        } catch (error: any) {
+          console.error('Login Failed', error);
+          // If backend returns an error message, display it
+          errorMessage.value = error.response?.data?.message || 'Invalid username or password';
+          localStorage.removeItem('auth_token'); // Clear local storage on failed login attempt
+          localStorage.removeItem('username');
         }
-
-        localStorage.removeItem('auth_token'); // Clear the local storage on failed login attempt
-        localStorage.removeItem('username');
       }
     };
 
+    // Redirect to GitHub OAuth
     const redirectToGithubOAuth = () => {
-      // Make a request to your backend to start the OAuth process
       apiClient.get('/auth/github/login')
         .then(response => {
-          // This will redirect the user to GitHub's authorization page
-          window.location.href = response.data.authUrl; // The backend should send this URL
+          window.location.href = response.data.authUrl;
         })
         .catch(error => {
           console.error('GitHub OAuth redirect failed', error);
@@ -96,7 +166,9 @@ export default defineComponent({
       loginData,
       handleLogin,
       errorMessage,
-      redirectToGithubOAuth
+      errors,
+      validateForm, // Return validateForm so it can be used in the template
+      redirectToGithubOAuth,
     };
   }
 });
@@ -104,22 +176,23 @@ export default defineComponent({
 
 <style scoped>
 .login-form {
-  max-width: 400px;
+  max-width: 400px;  /* Adjust form width */
   margin: 0 auto;
   padding: 2rem;
-  background-color: var(--color-background-light); /* Default light background */
+  background-color: var(--color-background-light);
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-top: 80px; /* Ensure it's not overlapped by the navbar */
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Add gap for spacing between inputs and button */
 }
 
-/* Heading */
 h2 {
   text-align: center;
   margin-bottom: 1.5rem;
 }
 
-/* Form groups */
 .form-group {
   margin-bottom: 1.2rem;
 }
@@ -130,7 +203,7 @@ label {
   margin-bottom: 0.5rem;
 }
 
-input {
+input, .p-inputtext {
   width: 100%;
   padding: 0.8rem;
   margin-bottom: 0.8rem;
@@ -139,43 +212,70 @@ input {
   font-size: 1rem;
 }
 
-input:focus {
+input:focus, .p-inputtext:focus {
   border-color: #27ae60;
   outline: none;
 }
 
-/* Login button styling */
-button.btn {
-  width: 100%;
-  padding: 0.8rem;
-  background-color: #27ae60; /* Green background */
-  color: black; /* Default text color (light mode) */
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.oauth-buttons {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.oauth-buttons p {
+  margin-bottom: 1rem;  /* Add margin to separate text from buttons */
+}
+
+.oauth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1rem;  /* Same padding as the login button */
+  font-size: 1rem;        /* Same font size */
+  background-color: #0366d6; /* Blue color for the button */
+  color: #ffffff;
   border: none;
   border-radius: 4px;
-  font-size: 1.1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease; /* Add color transition */
+  width: 100%;            /* Make the button fill the width */
+  margin: 0 auto;
+  transition: background-color 0.2s ease; /* Smooth transition for background color */
+  box-sizing: border-box; /* Ensure padding is included in button's total width */
 }
 
-button.btn:hover {
-  background-color: #2ecc71; /* Lighter green on hover */
-  color: black; /* Keep text black on hover in light mode */
+/* Hover effect for OAuth button */
+.oauth-btn:hover {
+  background-color: #0277b3; /* Darker blue on hover */
+  padding: 0.8rem 1rem;      /* Keep padding consistent */
+  transform: none;           /* Prevent size change */
+  box-shadow: none;          /* No box-shadow */
 }
 
-/* Night mode styles */
-body.night-mode .login-form {
-  background-color: #0b1218; /* Darker background for night mode */
+/* Active state for OAuth button */
+.oauth-btn:active {
+  background-color: #0277b3; /* Keep the same dark blue when button is pressed */
+  transform: none;           /* Prevent any scaling or size change */
 }
 
-body.night-mode button.btn {
-  color: white; /* White text for buttons in night mode */
+/* Focus state for OAuth button */
+.oauth-btn:focus {
+  outline: none;
+  background-color: #0277b3; /* Ensure focus color remains consistent */
 }
 
-body.night-mode button.btn:hover {
-  background-color: #2ecc71; /* Same green, but text white */
+/* Icon inside the button */
+.github-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
 }
 
-/* Link section */
 .register-link {
   text-align: center;
   margin-top: 1.5rem;
@@ -195,51 +295,10 @@ body.night-mode button.btn:hover {
   text-decoration: underline;
 }
 
-/* Error message styling */
-.error-message {
-  color: red;
-  text-align: center;
-  margin-top: 1rem;
-}
-
-.oauth-buttons {
-  text-align: center; /* Center content horizontally */
-  margin-top: 1.5rem; /* Add spacing above the section */
-}
-
-/* Ensure GitHub OAuth button gets the correct styling */
-.oauth-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 15px;
-  font-size: 16px;
-  background-color: #0366d6; /* GitHub blue */
-  color: #ffffff; /* White text */
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  width: auto;
-  margin: 0 auto;
-}
-
-.oauth-btn:hover {
-  background-color: #0288d1; /* Slightly darker blue on hover */
-}
-
-.github-icon {
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 8px; /* Spacing between icon and text */
-}
-
-/* Additional styling to make sure no interference from other button styles */
-button[type="submit"].btn {
-  background-color: #27ae60 !important; /* Green background for submit button */
-}
-
-button[type="button"].btn.oauth-btn {
-  background-color: #0366d6 !important; /* GitHub blue background */
+/* PrimeVue Button Custom Style */
+.btn {
+  font-size: 1rem;    /* Set font size to match input fields */
+  width: 100%;         /* Make the button fill the available space */
+  padding: 0.8rem;     /* Adjust padding to match input fields */
 }
 </style>

@@ -16,7 +16,11 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@primevue/forms": "^4.2.4",
+    "@primevue/themes": "^4.2.4",
     "axios": "^1.7.7",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.2.4",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5"
   },

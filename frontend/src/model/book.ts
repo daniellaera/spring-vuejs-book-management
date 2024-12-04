@@ -2,6 +2,7 @@ import type {CommentDTO} from "@/model/comment";
 
 export interface BookDTO {
   title: string;
+  image: string;
   isbn: string;
   id: number;
   description: string;

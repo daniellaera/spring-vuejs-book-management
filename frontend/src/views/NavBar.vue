@@ -1,35 +1,44 @@
 <template>
-  <nav class="navbar">
-    <RouterLink to="/" class="nav-button">Home</RouterLink>
-    <RouterLink v-if="!isLoggedIn" to="/signup" class="nav-button">Register</RouterLink>
-    <RouterLink v-if="!isLoggedIn" to="/login" class="nav-button">Login</RouterLink>
-    <button v-if="isLoggedIn" @click="logout" class="nav-button">Logout</button>
+  <div class="card">
+    <!-- Menubar with dynamic login/logout options and night mode toggle -->
+    <Menubar :model="items">
+      <!-- Night mode toggle button inside Menubar -->
+      <template #end>
+        <div class="menu-right-content">
+          <!-- Night mode toggle button -->
+          <Button
+            :icon="isNightMode ? 'pi pi-moon' : 'pi pi-sun'"
+            class="p-button-rounded p-button-text night-mode-toggle"
+            @click="toggleNightMode"
+          />
 
-    <!-- Welcome message with Full Name -->
-    <div v-if="isLoggedIn && sessionState.timeLeft > 0" class="welcome-message">
-      Welcome back, {{ getFullName() }}
-    </div>
+          <!-- Session timer displayed as a Badge inside the Menubar -->
+          <template v-if="isLoggedIn && sessionState.timeLeft > 0">
+            <span>Time left: </span>
+            <Badge :value="sessionState.timeLeft" severity="info" />
+          </template>
 
-    <!-- Countdown timer or session expired message -->
-    <div v-if="isLoggedIn && sessionState.timeLeft > 0" class="countdown-timer">
-      Time left in session: {{ sessionState.timeLeft }} seconds
-    </div>
-    <div v-else-if="!isLoggedIn || sessionState.timeLeft <= 0" class="session-expired">
-      You are not authenticated. Please log in.
-    </div>
-
-    <!-- Night mode toggle button -->
-    <button @click="toggleNightMode" class="night-mode-toggle">
-      <span v-if="isNightMode">🌙</span> <!-- Moon icon for night mode -->
-      <span v-else>🌞</span> <!-- Sun icon for day mode -->
-    </button>
-  </nav>
+          <!-- Display session expired message in Menubar -->
+          <template v-else-if="!isLoggedIn || sessionState.timeLeft <= 0">
+            <Badge value="Session Expired" severity="danger" />
+          </template>
+        </div>
+      </template>
+    </Menubar>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { sessionState, isLoggedIn, updateUserDetails } from '@/service/useSession';
-import { ref, onMounted, watch } from 'vue';
-import apiClient from "@/plugins/axiosConfig";
+import apiClient from '@/plugins/axiosConfig';
+import Menubar from 'primevue/menubar';
+import Button from 'primevue/button';
+import Badge from 'primevue/badge';
+
+// Router instance
+const router = useRouter();
 
 // Track whether night mode is active
 const isNightMode = ref(false);
@@ -37,23 +46,21 @@ const isNightMode = ref(false);
 // Function to toggle night mode
 const toggleNightMode = () => {
   isNightMode.value = !isNightMode.value;
-  document.body.classList.toggle('night-mode', isNightMode.value);
+  document.documentElement.classList.toggle('my-app-dark', isNightMode.value);
   localStorage.setItem('night-mode', isNightMode.value ? 'true' : 'false');
 };
 
 // On component mount, check night mode state and fetch user details if logged in
 onMounted(() => {
-  // Restore night mode state
   const savedNightMode = localStorage.getItem('night-mode');
   if (savedNightMode === 'true') {
     isNightMode.value = true;
-    document.body.classList.add('night-mode');
+    document.documentElement.classList.add('my-app-dark');
   } else {
     isNightMode.value = false;
-    document.body.classList.remove('night-mode');
+    document.documentElement.classList.remove('my-app-dark');
   }
 
-  // Fetch user details only if logged in
   if (isLoggedIn.value) {
     updateUserDetails(apiClient);
   }
@@ -80,92 +87,74 @@ watch(isLoggedIn, (newVal) => {
   }
 });
 
+// Function to get full name of the user
 const getFullName = () => {
-  const userDetails = sessionState.userDetails.fullName
-
-  if (userDetails === "null null") {
-    return 'Guest';
-  }
-
-  return userDetails;
+  const userDetails = sessionState.userDetails.fullName;
+  return userDetails === 'null null' ? 'Guest' : userDetails;
 };
+
+// Reactive Menubar items with conditional visibility based on session state
+const items = computed(() => [
+  {
+    label: 'Home',
+    icon: 'pi pi-home',
+    command: () => router.push('/'), // Navigate to home page
+  },
+  {
+    label: 'User',
+    icon: 'pi pi-user',
+    items: [
+      {
+        label: 'Register',
+        icon: 'pi pi-user-plus',
+        command: () => router.push('/signup'),
+        visible: !isLoggedIn.value,
+      },
+      {
+        label: 'Login',
+        icon: 'pi pi-sign-in',
+        command: () => router.push('/login'),
+        visible: !isLoggedIn.value,
+      },
+      {
+        label: 'Logout',
+        icon: 'pi pi-sign-out',
+        command: logout,
+        visible: isLoggedIn.value,
+      },
+    ],
+  },
+  {
+    label: `Welcome, ${getFullName()}`,
+    icon: 'pi pi-smile',
+    visible: isLoggedIn.value && sessionState.timeLeft > 0, // Show if logged in and session is valid
+  },
+  {
+    label: 'Please Log In',
+    icon: 'pi pi-exclamation-triangle',
+    disabled: true,
+    visible: !isLoggedIn.value || sessionState.timeLeft <= 0, // Show if not logged in or session expired
+  },
+]);
 </script>
 
 <style scoped>
-/* Navbar styling */
-.navbar {
+/* Styling for Menubar right content */
+.menu-right-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background-color: var(--color-background-soft);
-  padding: 1rem 2rem;
-  border-bottom: 2px solid var(--color-border);
-  position: fixed;  /* Sticks the navbar at the top */
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000; /* Makes sure the navbar stays on top of other content */
-  box-sizing: border-box;
+  gap: 10px; /* Space between night mode button and badge */
 }
 
-/* Navbar link styling */
-.nav-button {
-  font-size: 1.1em;
-  padding: 12px 28px;
-  text-decoration: none;
-  border: 2px solid transparent;
-  border-radius: 5px;
-  color: var(--color-heading);
-  background-color: var(--color-background-mute);
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-  margin: 0 10px;
-  display: inline-block;
-  box-sizing: border-box;
-}
-
-/* Hover effect for nav buttons */
-.nav-button:hover {
-  background-color: var(--color-heading);
-  border-color: var(--color-heading);
-}
-
-/* Countdown timer and session expired message */
-.countdown-timer {
-  font-size: 1em;
-  color: var(--color-heading);
-  font-weight: bold;
-}
-
-.session-expired {
-  font-size: 1em;
-  color: #e74c3c; /* Red color for expired session */
-  font-weight: bold;
-}
-
-/* Night mode toggle button styling */
+/* Styling for night mode toggle button */
 .night-mode-toggle {
   padding: 10px 20px;
-  background-color: transparent; /* No background for icon button */
+  background-color: transparent;
   border: none;
   cursor: pointer;
-  font-size: 2rem; /* Larger icon */
-  color: var(--color-heading); /* Default color in light mode */
+  font-size: 2rem;
+  color: var(--color-heading);
   transition: color 0.3s;
-  display: inline-flex;
-  align-items: center;
 }
 
-/* Hover effect for the moon/sun button */
-.night-mode-toggle:hover {
-  color: var(--color-heading); /* Ensure the color matches when hovering */
-}
-
-/* Night mode specific styles */
-body.night-mode .navbar {
-  background-color: #0b1218; /* Dark background for navbar in night mode */
-}
-
-body.night-mode .night-mode-toggle {
-  color: #fff; /* White moon/sun icon in night mode */
-}
 </style>

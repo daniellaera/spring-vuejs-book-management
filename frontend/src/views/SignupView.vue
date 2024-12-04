@@ -3,24 +3,56 @@
     <form @submit.prevent="handleSignUp">
       <h2>Create Account</h2>
 
+      <!-- Email Input (PrimeVue InputText) -->
       <div class="form-group">
         <label for="email">Email</label>
-        <input v-model="signUpData.email" type="email" id="email" placeholder="Enter your email" required />
+        <InputText
+          v-model="signUpData.email"
+          id="email"
+          type="email"
+          placeholder="Enter your email"
+          required
+          @input="validateForm"
+          :class="{'p-invalid': errors.email}"
+        />
+        <Message v-if="errors.email" severity="error" size="small" variant="simple">
+          {{ errors.email }}
+        </Message>
       </div>
 
+      <!-- Password Input (PrimeVue Password) -->
       <div class="form-group">
         <label for="password">Password</label>
-        <input v-model="signUpData.password" type="password" id="password" placeholder="Enter your password" required />
+        <Password
+          v-model="signUpData.password"
+          id="password"
+          placeholder="Enter your password"
+          required
+          @input="validateForm"
+          :class="{'p-invalid': errors.password}"
+        />
+        <Message v-if="errors.password" severity="error" size="small" variant="simple">
+          {{ errors.password }}
+        </Message>
       </div>
 
-      <button type="submit" class="btn">Sign Up</button>
+      <!-- Sign Up Button (PrimeVue PrimeButton) -->
+      <PrimeButton
+        label="Sign Up"
+        icon="pi pi-user-plus"
+        class="btn"
+        :disabled="!signUpData.email || !signUpData.password || !!errors.email || !!errors.password"
+        type="submit"
+      />
 
-      <!-- Show error message if login failed -->
+      <!-- Error Message (if signup fails) -->
       <div v-if="errorMessage" class="error-message">
-        <p>{{ errorMessage }}</p>
+        <Message severity="error" text="An error occurred. Please try again.">
+          <p>{{ errorMessage }}</p>
+        </Message>
       </div>
 
-
+      <!-- Login Link -->
       <div class="login-link">
         <p>Already have an account? <RouterLink to="/login">Login</RouterLink></p>
       </div>
@@ -30,45 +62,74 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import apiClient from '@/plugins/axiosConfig';
 import { useRouter } from 'vue-router';
+import { InputText, Password, Message } from 'primevue';
+import PrimeButton from 'primevue/button';
+import apiClient from '@/plugins/axiosConfig';
 
 export default defineComponent({
   name: 'SignUpForm',
+  components: {
+    InputText,
+    Password,
+    PrimeButton,
+    Message,
+  },
   setup() {
     const router = useRouter();
 
     const signUpData = ref({
       email: '',
-      password: ''
+      password: '',
     });
 
     const errorMessage = ref<string | null>(null);  // Reactive error message
+    const errors = ref({
+      email: '',
+      password: '',
+    });
 
+    // Form validation logic
+    const validateForm = () => {
+      errors.value.email = !signUpData.value.email
+        ? 'Email is required.'
+        : !/\S+@\S+\.\S+/.test(signUpData.value.email)
+          ? 'Invalid email format.'
+          : '';
+
+      errors.value.password = !signUpData.value.password ? 'Password is required.' : '';
+    };
+
+    // Form submission handler
     const handleSignUp = async () => {
-      try {
-        const response = await apiClient.post('/auth/signup', signUpData.value);
-        console.log('Sign Up Success', response.data);
+      validateForm();
 
-        // Optionally, redirect after successful sign-up
-        await router.push('/login');
-      } catch (error: any) {
-        if (error.response) {
-          // If the response contains a message (like "Invalid username or password")
-          errorMessage.value = error.response.data || 'An error occurred. Please try again.';
-        } else {
-          errorMessage.value = 'An unknown error occurred. Please try again.';
+      if (!errors.value.email && !errors.value.password) {
+        try {
+          const response = await apiClient.post('/auth/signup', signUpData.value);
+          console.log('Sign Up Success', response.data);
+
+          // Redirect to login after successful sign-up
+          await router.push('/login');
+        } catch (error: any) {
+          if (error.response) {
+            errorMessage.value = error.response.data || 'An error occurred. Please try again.';
+          } else {
+            errorMessage.value = 'An unknown error occurred. Please try again.';
+          }
+          console.error('Sign Up Failed', error);
         }
-        console.error('Sign Up Failed', error);
       }
     };
 
     return {
       signUpData,
       errorMessage,
-      handleSignUp
+      errors,
+      handleSignUp,
+      validateForm,
     };
-  }
+  },
 });
 </script>
 
@@ -100,7 +161,8 @@ label {
   margin-bottom: 0.5rem;
 }
 
-input {
+input,
+.p-password {
   width: 100%;
   padding: 0.8rem;
   margin-bottom: 0.8rem;
@@ -109,43 +171,41 @@ input {
   font-size: 1rem;
 }
 
-input:focus {
-  border-color: #27ae60;
+input:focus,
+.p-password:focus {
+  border-color: #27ae60; /* Green border when focused */
   outline: none;
 }
 
+.p-invalid {
+  border-color: red !important; /* Red border on invalid fields */
+}
+
 /* Sign up button styling */
-button.btn {
+button.btn,
+.p-button {
   width: 100%;
   padding: 0.8rem;
   background-color: #27ae60; /* Green background */
-  color: black; /* Default text color (light mode) */
+  color: white; /* Text color */
   border: none;
   border-radius: 4px;
   font-size: 1.1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease; /* Add color transition */
+  transition: background-color 0.3s ease;
 }
 
-button.btn:hover {
+button.btn:hover,
+.p-button:hover {
   background-color: #2ecc71; /* Lighter green on hover */
-  color: black; /* Keep text black on hover in light mode */
 }
 
-/* Night mode styles */
-body.night-mode .signup-form {
-  background-color: #0b1218; /* Darker background for night mode */
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 1rem;
 }
 
-body.night-mode button.btn {
-  color: white; /* White text for buttons in night mode */
-}
-
-body.night-mode button.btn:hover {
-  background-color: #2ecc71; /* Same green, but text white */
-}
-
-/* Link section */
 .login-link {
   text-align: center;
   margin-top: 1.5rem;
@@ -163,11 +223,5 @@ body.night-mode button.btn:hover {
 
 .login-link a:hover {
   text-decoration: underline;
-}
-
-.error-message {
-  color: red;
-  text-align: center;
-  margin-top: 1rem;
 }
 </style>
