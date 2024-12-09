@@ -30,7 +30,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -104,6 +107,11 @@ public class CommentControllerIT {
         book.setIsbn("978-1234567890");
         book.setAuthor("Thomas H. Cormen");
         book.setGenre("Fiction");
+        // Use LocalDate and convert to Date
+        LocalDate publishedLocalDate = LocalDate.of(2020, 5, 15); // May 15, 2020
+        book.setPublishedDate(Date.from(publishedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+        book.setCreatedDate(new Date()); // Current date and time
         bookRepository.save(book);
 
         Comment comment1 = new Comment();

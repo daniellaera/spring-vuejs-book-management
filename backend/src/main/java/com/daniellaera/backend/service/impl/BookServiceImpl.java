@@ -36,6 +36,42 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findById(bookId).map(this::convertBookEntityToBookDto);
     }
 
+    @Override
+    public BookDTO createBook(BookDTO bookDTO) {
+        Book book = convertBookDTOToBookEntity(bookDTO);
+        Book savedBook = bookRepository.save(book);
+        return convertBookEntityToBookDto(savedBook);
+    }
+
+    private Book convertBookDTOToBookEntity(BookDTO bookDTO) {
+        Book book = new Book();
+
+        List<Comment> comments = Optional.ofNullable(bookDTO.getComments())
+                .orElse(List.of())
+                .stream()
+                .map(commentDTO -> {
+                    Comment comment = convertCommentDTOToCommentEntity(commentDTO);
+                    comment.setBook(book);
+                    return comment;
+                })
+                .toList();
+        book.setComments(comments);
+        book.setAuthor(bookDTO.getAuthor());
+        book.setTitle(bookDTO.getTitle());
+        book.setIsbn(bookDTO.getIsbn());
+        book.setGenre(bookDTO.getGenre());
+        book.setDescription(bookDTO.getDescription());
+        book.setPublishedDate(bookDTO.getPublishedDate());
+
+        return book;
+    }
+
+    private Comment convertCommentDTOToCommentEntity(CommentDTO commentDTO) {
+        Comment comment = new Comment();
+        comment.setContent(commentDTO.getContent());
+        return comment;
+    }
+
     private BookDTO convertBookEntityToBookDto(Book book) {
         BookDTO bookDto = new BookDTO();
         bookDto.setId(book.getId());
@@ -44,6 +80,8 @@ public class BookServiceImpl implements BookService {
         bookDto.setIsbn(book.getIsbn());
         bookDto.setAuthor(book.getAuthor());
         bookDto.setGenre(book.getGenre());
+        bookDto.setCreatedDate(book.getCreatedDate());
+        bookDto.setPublishedDate(book.getPublishedDate());
         List<CommentDTO> commentDTOList =
                 (book.getComments() != null) ? book.getComments()
                         .stream()

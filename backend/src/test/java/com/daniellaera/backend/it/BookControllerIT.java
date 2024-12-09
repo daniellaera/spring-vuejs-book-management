@@ -1,10 +1,7 @@
 package com.daniellaera.backend.it;
 
 import com.daniellaera.backend.model.Book;
-import com.daniellaera.backend.model.Role;
-import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.repository.BookRepository;
-import com.daniellaera.backend.repository.UserRepository;
 import org.flywaydb.test.annotation.FlywayTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,11 +18,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Date;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -80,18 +81,24 @@ public class BookControllerIT {
         book1.setAuthor("Thomas H. Cormen");
         book1.setGenre("Fiction");
 
+        LocalDate publishedLocalDate = LocalDate.of(2020, 5, 15); // May 15, 2020
+        book1.setPublishedDate(Date.from(publishedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        book1.setCreatedDate(new Date());
+
         Book book2 = new Book();
         book2.setTitle("Title 2");
         book2.setDescription("Description 2");
         book2.setIsbn("978-0262033848");
         book2.setAuthor("Joshua Bloch");
         book2.setGenre("Programming");
+        book2.setPublishedDate(Date.from(publishedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        book2.setCreatedDate(new Date());
 
         bookRepository.saveAll(Arrays.asList(book1, book2));
     }
 
     @Test
-    void getPosts_ReturnsAllPosts() throws Exception {
+    void getBooks_ReturnsAllBooks() throws Exception {
         mockMvc.perform(get("/api/v3/book")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -102,7 +109,7 @@ public class BookControllerIT {
     }
 
     @Test
-    void getPosts_WhenNoBooks_ReturnsEmptyArray() throws Exception {
+    void getBooks_WhenNoBooks_ReturnsEmptyArray() throws Exception {
         bookRepository.deleteAll();
 
         mockMvc.perform(get("/api/v3/book")
@@ -113,12 +120,49 @@ public class BookControllerIT {
     }
 
     @Test
-    void getPosts_CheckSingleFieldContent() throws Exception {
+    void getBooks_CheckSingleFieldContent() throws Exception {
         mockMvc.perform(get("/api/v3/book")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].title").value("Title 1"))
                 .andExpect(jsonPath("$[1].title").value("Title 2"));
+    }
+
+    @Test
+    void createBook_CreatesBookSuccessfully() throws Exception {
+        // Arrange
+        String bookJson = """
+        {
+            "title": "New Book Title",
+            "description": "New Book Description",
+            "isbn": "978-0000000000",
+            "author": "New Author",
+            "genre": "Science Fiction",
+            "publishedDate": "2023-01-01"
+        }
+        """;
+
+        // Act & Assert
+        mockMvc.perform(post("/api/v3/book")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.title").value("New Book Title"))
+                .andExpect(jsonPath("$.description").value("New Book Description"))
+                .andExpect(jsonPath("$.isbn").value("978-0000000000"))
+                .andExpect(jsonPath("$.author").value("New Author"))
+                .andExpect(jsonPath("$.genre").value("Science Fiction"))
+                .andExpect(jsonPath("$.publishedDate").value("2023-01-01T00:00:00.000+00:00")); // Ensure the date matches
+
+        // Verify that the book is stored in the database
+        assertThat(bookRepository.findAll()).hasSize(3); // Two books from setup + one new book
+        Book savedBook = bookRepository.findAll().stream()
+                .filter(book -> "New Book Title".equals(book.getTitle()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(savedBook.getTitle()).isEqualTo("New Book Title");
+        assertThat(savedBook.getPublishedDate()).isNotNull();
     }
 }

@@ -117,12 +117,24 @@ const items = computed(() => [
         visible: !isLoggedIn.value,
       },
       {
+        label: 'User Settings',
+        icon: 'pi pi-cog',
+        command: () => router.push('/edit-user'),
+        visible: isLoggedIn.value, // Only visible if logged in
+      },
+      {
         label: 'Logout',
         icon: 'pi pi-sign-out',
         command: logout,
         visible: isLoggedIn.value,
       },
     ],
+  },
+  {
+    label: 'Create a Book',
+    icon: 'pi pi-book',
+    command: () => router.push('/create-book'),
+    visible: isLoggedIn.value, // Only visible if logged in
   },
   {
     label: `Welcome, ${getFullName()}`,

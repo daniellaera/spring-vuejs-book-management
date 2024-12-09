@@ -55,12 +55,11 @@
       />
 
       <!-- Error Message (if login fails) -->
-      <Message
-        v-if="errorMessage"
-        severity="error"
-        text="{{ errorMessage }}"
-        class="error-message"
-      />
+      <div v-if="errorMessage" class="error-message">
+        <Message severity="error" text="An error occurred. Please try again.">
+          <p>{{ errorMessage }}</p>
+        </Message>
+      </div>
 
       <!-- OAuth Login Options -->
       <div class="oauth-buttons">

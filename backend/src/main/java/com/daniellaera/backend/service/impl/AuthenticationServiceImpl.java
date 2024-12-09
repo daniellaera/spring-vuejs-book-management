@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -77,6 +78,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             log.error("Invalid email or password for email: {}", request.getEmail(), e);
             throw e;
         }
+    }
+
+    @Override
+    public User updateUser(String userEmail, SignUpRequest updatedUserData) {
+        log.info("Loading user by username: {}", userEmail);
+
+        User existingUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> {
+                    log.error("User not found with email: {}", userEmail);
+                    return new UsernameNotFoundException("User not found with email: " + userEmail);
+                });
+
+        existingUser.setFirstName(updatedUserData.getFirstName());
+        existingUser.setLastName(updatedUserData.getLastName());
+
+        return userRepository.save(existingUser);
     }
 
     @Override

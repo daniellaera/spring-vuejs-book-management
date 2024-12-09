@@ -9,4 +9,6 @@ export interface BookDTO {
   author: string;
   genre: string;
   comments: CommentDTO[];
+  createdDate: Date;
+  publishedDate: Date | null; // Allow null only
 }

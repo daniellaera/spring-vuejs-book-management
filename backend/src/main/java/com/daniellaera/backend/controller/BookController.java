@@ -5,10 +5,7 @@ import com.daniellaera.backend.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -34,5 +31,11 @@ public class BookController {
     public ResponseEntity<BookDTO> getBook(@PathVariable Integer bookId) {
         BookDTO book = bookService.findBookById(bookId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
         return ResponseEntity.ok().body(book);
+    }
+
+    @PostMapping
+    public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO book) {
+        BookDTO createdBook = bookService.createBook(book);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
     }
 }

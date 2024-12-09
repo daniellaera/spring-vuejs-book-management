@@ -4,6 +4,7 @@ import router from '@/router'; // This should match the alias set in vite.config
 import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import 'primeicons/primeicons.css'
+import ToastService from 'primevue/toastservice';
 
 const app = createApp(App);
 
@@ -16,5 +17,6 @@ app.use(PrimeVue, {
   }
 }); // Register PrimeVue plugin
 app.use(router);   // Register Vue Router
+app.use(ToastService);
 
 app.mount('#app');

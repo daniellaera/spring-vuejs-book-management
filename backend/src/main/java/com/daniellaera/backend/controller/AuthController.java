@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -150,6 +151,28 @@ public class AuthController {
             return ResponseEntity.accepted().body(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User with email '" + request.getEmail() + "' already exists");
+        }
+    }
+
+    @PatchMapping
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<?> updateUser(
+            @AuthenticationPrincipal User currentUser, // Get the logged-in user
+            @RequestBody SignUpRequest updatedUserData) {
+        if (currentUser.getEmail() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        String userEmail = currentUser.getEmail();
+        try {
+            User updatedUser = authenticationService.updateUser(userEmail, updatedUserData);
+            return ResponseEntity.ok(Map.of(
+                    "id", updatedUser.getId(),
+                    "email", updatedUser.getEmail(),
+                    "firstName", updatedUser.getFirstName(),
+                    "lastName", updatedUser.getLastName()
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 

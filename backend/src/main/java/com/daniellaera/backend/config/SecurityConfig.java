@@ -3,7 +3,6 @@ package com.daniellaera.backend.config;
 import com.daniellaera.backend.service.impl.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -47,7 +46,6 @@ public class SecurityConfig {
     //}
 
     @Bean
-    //@Order(0)
     public SecurityFilterChain securityFilterChainOauth2(HttpSecurity http) throws Exception {
         return http
                 .cors(withDefaults())
