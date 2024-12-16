@@ -61,18 +61,10 @@ public class BookControllerIT {
 
     @Autowired
     private BookRepository bookRepository;
-    //@Autowired
-    //private UserRepository userRepository;
 
     @BeforeEach
     void setup() {
         bookRepository.deleteAll();
-       // userRepository.deleteAll();
-        //User user = new User();
-        //user.setEmail("john.doe@example.com");
-        //user.setPassword("password");
-        //user.setRole(Role.USER);
-       // userRepository.save(user);
 
         Book book1 = new Book();
         book1.setTitle("Title 1");
@@ -100,12 +92,17 @@ public class BookControllerIT {
     @Test
     void getBooks_ReturnsAllBooks() throws Exception {
         mockMvc.perform(get("/api/v3/book")
+                        .param("page", "0")
+                        .param("size", "5")
+                        .param("sort", "title,asc")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].title").value("Title 1"))
-                .andExpect(jsonPath("$[1].title").value("Title 2"));
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.content[0].title").value("Title 1"))
+                .andExpect(jsonPath("$.content[1].title").value("Title 2"));
     }
 
     @Test
@@ -113,20 +110,28 @@ public class BookControllerIT {
         bookRepository.deleteAll();
 
         mockMvc.perform(get("/api/v3/book")
+                        .param("page", "0")
+                        .param("size", "5")
+                        .param("sort", "title,asc")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$.content").isEmpty())
+                .andExpect(jsonPath("$.totalElements").value(0))
+                .andExpect(jsonPath("$.totalPages").value(0));
     }
 
     @Test
     void getBooks_CheckSingleFieldContent() throws Exception {
         mockMvc.perform(get("/api/v3/book")
+                        .param("page", "0")
+                        .param("size", "5")
+                        .param("sort", "title,asc")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].title").value("Title 1"))
-                .andExpect(jsonPath("$[1].title").value("Title 2"));
+                .andExpect(jsonPath("$.content[0].title").value("Title 1"))
+                .andExpect(jsonPath("$.content[1].title").value("Title 2"));
     }
 
     @Test

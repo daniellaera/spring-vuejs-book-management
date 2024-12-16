@@ -3,6 +3,8 @@ package com.daniellaera.backend.controller;
 import com.daniellaera.backend.dao.BookDTO;
 import com.daniellaera.backend.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +24,8 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookDTO>> getBooks() {
-        List<BookDTO> bookList = bookService.getAllBooks();
-        return ResponseEntity.ok().body(bookList);
+    public Page<BookDTO> getAllBooks(Pageable pageable) {
+        return bookService.getAllBooks(pageable);
     }
 
     @GetMapping("{bookId}")

@@ -1,14 +1,15 @@
 package com.daniellaera.backend.service;
 
 import com.daniellaera.backend.dao.BookDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public interface BookService {
-    List<BookDTO> getAllBooks();
+    Page<BookDTO> getAllBooks(Pageable pageable);
 
     Optional<BookDTO> findBookById(Integer bookId);
 

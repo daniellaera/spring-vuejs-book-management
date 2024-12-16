@@ -7,11 +7,12 @@ import com.daniellaera.backend.model.Comment;
 import com.daniellaera.backend.repository.BookRepository;
 import com.daniellaera.backend.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class BookServiceImpl implements BookService {
@@ -24,11 +25,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDTO> getAllBooks() {
-        return bookRepository.findAll()
-                .stream()
-                .map(this::convertBookEntityToBookDto)
-                .collect(Collectors.toList());
+    public Page<BookDTO> getAllBooks(Pageable pageable) {
+        return bookRepository.findAll(pageable)
+                .map(this::convertBookEntityToBookDto);
     }
 
     @Override
