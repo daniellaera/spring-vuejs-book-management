@@ -102,11 +102,8 @@ public class AuthController {
 
             if (userResponse.getBody() != null) {
                 String email = (userResponse.getBody().get("email") != null) ? userResponse.getBody().get("email").toString() : "no-email-found";
-                String username = (userResponse.getBody().get("name") != null) ? userResponse.getBody().get("name").toString() : "no-username-found";
-
-                if ("no-username-found".equals(username)) {
-                    username = "GITHUB USER";
-                }
+                String githubId = userResponse.getBody().get("id").toString(); // Unique GitHub user ID
+                String username = userResponse.getBody().get("name") != null ? userResponse.getBody().get("name").toString() : githubId;
 
                 try {
                     JwtAuthenticationResponse jwtResponse = authenticationService.signupOrSigninWithGitHub(email, username);
@@ -135,10 +132,17 @@ public class AuthController {
             // Extract the UserDetails (your custom User object) from the Authentication object
             User user = (User) authentication.getPrincipal();
 
-            return ResponseEntity.ok(Map.of(
-                    "username", user.getUsername(),
-                    "fullName", user.getFullName()
-            ));
+            // Create a mutable map to add fields dynamically
+            Map<String, Object> response = new HashMap<>();
+            response.put("username", user.getUsername());
+            response.put("fullName", user.getFullName());
+
+            // Conditionally add githubId if it is not null
+            if (user.getGithubId() != null) {
+                response.put("githubId", user.getGithubId());
+            }
+
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
         }

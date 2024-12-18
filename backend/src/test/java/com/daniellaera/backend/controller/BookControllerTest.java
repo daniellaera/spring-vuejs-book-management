@@ -19,13 +19,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Arrays;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -87,7 +84,7 @@ public class BookControllerTest {
     }
 
     @Test
-    void createBook_success() throws Exception {
+    void createBook_ReturnsUnauthorized() throws Exception {
         BookDTO bookDTO = new BookDTO();
         bookDTO.setIsbn("123456789");
         bookDTO.setTitle("Title");
@@ -95,28 +92,13 @@ public class BookControllerTest {
         bookDTO.setAuthor("Thomas H. Cormen");
         bookDTO.setGenre("Fiction");
 
-        BookDTO createdBookDTO = new BookDTO();
-        createdBookDTO.setId(1);
-        createdBookDTO.setIsbn(bookDTO.getIsbn());
-        createdBookDTO.setTitle(bookDTO.getTitle());
-        createdBookDTO.setDescription(bookDTO.getDescription());
-        createdBookDTO.setAuthor(bookDTO.getAuthor());
-        createdBookDTO.setGenre(bookDTO.getGenre());
-
-        given(bookService.createBook(refEq(bookDTO))).willReturn(createdBookDTO);
         String reqBody = new ObjectMapper().writeValueAsString(bookDTO);
 
         mockMvc.perform(post("/api/v3/book")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reqBody))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.isbn").value("123456789"))
-                .andExpect(jsonPath("$.title").value("Title"))
-                .andExpect(jsonPath("$.description").value("Description"))
-                .andExpect(jsonPath("$.author").value("Thomas H. Cormen"))
-                .andExpect(jsonPath("$.genre").value("Fiction"));
+                .andExpect(status().isUnauthorized());
 
-        verify(bookService, times(1)).createBook(refEq(bookDTO));
+        verify(bookService, times(0)).createBook(any(), anyString());
     }
 }

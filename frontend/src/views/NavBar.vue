@@ -36,6 +36,7 @@ import apiClient from '@/plugins/axiosConfig';
 import Menubar from 'primevue/menubar';
 import Button from 'primevue/button';
 import Badge from 'primevue/badge';
+import Tag from 'primevue/tag';
 
 // Router instance
 const router = useRouter();
@@ -102,7 +103,7 @@ const items = computed(() => [
   },
   {
     label: 'User',
-    icon: 'pi pi-user',
+    icon: 'pi pi-user-edit',
     items: [
       {
         label: 'Register',
@@ -138,7 +139,7 @@ const items = computed(() => [
   },
   {
     label: `Welcome, ${getFullName()}`,
-    icon: 'pi pi-smile',
+    icon: () => (sessionState.userDetails.githubId ? 'pi pi-github' : 'pi pi-user'),
     visible: isLoggedIn.value && sessionState.timeLeft > 0, // Show if logged in and session is valid
   },
   {

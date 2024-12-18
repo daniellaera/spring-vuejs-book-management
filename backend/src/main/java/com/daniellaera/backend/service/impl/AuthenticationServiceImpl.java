@@ -10,6 +10,7 @@ import com.daniellaera.backend.repository.UserRepository;
 import com.daniellaera.backend.service.AuthenticationService;
 import com.daniellaera.backend.service.JwtService;
 import com.daniellaera.backend.service.RefreshTokenService;
+import com.daniellaera.backend.utils.NameGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -97,49 +99,53 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public JwtAuthenticationResponse signupOrSigninWithGitHub(String email, String username) {
-        Optional<User> existingUser = userRepository.findByEmail(email);
+    public JwtAuthenticationResponse signupOrSigninWithGitHub(String email, String githubId) {
+        Optional<User> existingUserByEmail = userRepository.findByEmail(email);
 
-        if (existingUser.isPresent()) {
-            log.info("User with email '{}' already exists", email);
-            log.info("Login the user and creating a JWT token");
-
-            User user = existingUser.get();
-            String token = jwtService.generateToken(user.getUsername(), "USER");
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-            return JwtAuthenticationResponse
-                    .builder()
-                    .token(token)
-                    .refreshToken(refreshToken.getToken())
-                    .username(user.getFirstName() + " " + user.getLastName())
-                    .build();
-        } else {
-            log.info("User with email '{}' does not exists", email);
-            log.info("Signup the user and creating a JWT token");
-
-            String[] nameParts = username.split(" ", 2);
-            String firstName = nameParts[0];
-            String lastName = nameParts[1];
-            User newUser = User.builder()
-                    .email(email)
-                    .firstName(firstName)
-                    .lastName(lastName)
-                    .password(passwordEncoder.encode("temporarypassword"))  // todo should we tell the user its temporary password somehow?
-                    .role(Role.USER)
-                    .build();
-
-            userRepository.save(newUser);
-
-            String token = jwtService.generateToken(newUser.getUsername(), newUser.getRole().toString());
-
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(newUser.getId());
-
-            return JwtAuthenticationResponse
-                    .builder()
-                    .token(token)
-                    .refreshToken(refreshToken.getToken())
-                    .username(newUser.getFirstName() + " " + newUser.getLastName()) // Provide the user's full name
-                    .build();
+        if (existingUserByEmail.isPresent()) {
+            log.info("User with email '{}' already exists. Logging in.", email);
+            return generateJwtResponse(existingUserByEmail.get());
         }
+
+        // Check if user exists by GitHub ID
+        Optional<User> existingUserByGithubId = userRepository.findByGithubId(githubId);
+
+        if (existingUserByGithubId.isPresent()) {
+            log.info("User with githubId '{}' found. Updating email to '{}'.", githubId, email);
+
+            User existingUser = existingUserByGithubId.get();
+            existingUser.setEmail(email); // Update email
+            userRepository.save(existingUser);
+
+            return generateJwtResponse(existingUser);
+        }
+
+        // Create a new user
+        log.info("No existing user found. Creating a new user with GitHub ID '{}'.", githubId);
+
+        User newUser = User.builder()
+                .email(email)
+                .githubId(githubId)
+                .firstName(NameGenerator.generateRandomName())
+                .lastName(NameGenerator.generateUniqueSuffix())
+                .password(passwordEncoder.encode(UUID.randomUUID().toString())) // Secure temporary password
+                .role(Role.USER)
+                .build();
+
+        userRepository.save(newUser);
+
+        return generateJwtResponse(newUser);
+    }
+
+    private JwtAuthenticationResponse generateJwtResponse(User user) {
+        String token = jwtService.generateToken(user.getUsername(), user.getRole().toString());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+
+        return JwtAuthenticationResponse
+                .builder()
+                .token(token)
+                .refreshToken(refreshToken.getToken())
+                .username(user.getFirstName() + " " + user.getLastName())
+                .build();
     }
 }

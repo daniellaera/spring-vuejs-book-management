@@ -16,4 +16,5 @@ public class BookDTO {
     private Date createdDate;
     private Date publishedDate;
     private List<CommentDTO> comments;
+    private UserDTO userDTO;
 }

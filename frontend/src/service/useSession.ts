@@ -3,14 +3,14 @@ import { reactive, computed } from 'vue';
 interface SessionState {
   tokenExpiration: number | null;
   timeLeft: number;
-  userDetails: { fullName: string | null }; // Store user details
+  userDetails: { fullName: string | null, githubId: string | null }; // Store user details
 }
 
 // Initialize sessionState as a reactive object
 export const sessionState = reactive<SessionState>({
   tokenExpiration: null,
   timeLeft: 0,
-  userDetails: { fullName: null },
+  userDetails: { fullName: null, githubId: null },
 });
 
 // Computed property to check if the user is logged in
@@ -92,6 +92,7 @@ export async function updateUserDetails(apiClient: any) {
       headers: { Authorization: `Bearer ${token}` },
     });
     sessionState.userDetails.fullName = response.data.fullName; // Update the user details
+    sessionState.userDetails.githubId = response.data.githubId || null; // Default to null if githubId is missing
   } catch (error) {
     console.error('Failed to fetch user details:', error);
     resetSession(); // Reset session on error

@@ -11,5 +11,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // Since email is unique, we'll find users by email
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByGithubId(String githubId);
+
     boolean existsByEmail(String email);
 }

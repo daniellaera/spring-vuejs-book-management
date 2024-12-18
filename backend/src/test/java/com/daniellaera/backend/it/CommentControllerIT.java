@@ -112,6 +112,7 @@ public class CommentControllerIT {
         book.setPublishedDate(Date.from(publishedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
         book.setCreatedDate(new Date()); // Current date and time
+        book.setCreatedBy(user);
         bookRepository.save(book);
 
         Comment comment1 = new Comment();

@@ -147,7 +147,11 @@ const submitForm = async () => {
       publishedDate: book.value.publishedDate?.toISOString(),
     };
 
-    const response = await apiClient.post("/book", formattedBook);
+    const token = localStorage.getItem('auth_token');
+
+    const response = await apiClient.post("/book", formattedBook, {
+      headers: { Authorization: `Bearer ${token}` }, // Pass the token in the header
+    });
     console.log("Book created:", response.data);
 
     toast.add({

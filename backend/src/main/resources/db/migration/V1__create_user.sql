@@ -5,6 +5,7 @@ CREATE TABLE _user
     first_name VARCHAR(255),
     last_name  VARCHAR(255),
     email      VARCHAR(255)                             NOT NULL,
+    github_id  VARCHAR(255),
     password   VARCHAR(255)                             NOT NULL,
     role       VARCHAR(50)                              NOT NULL, -- Assuming roles like 'USER', 'ADMIN' are short strings
     CONSTRAINT pk_user PRIMARY KEY (id),

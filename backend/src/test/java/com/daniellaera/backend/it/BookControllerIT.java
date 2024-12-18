@@ -1,16 +1,24 @@
 package com.daniellaera.backend.it;
 
 import com.daniellaera.backend.model.Book;
+import com.daniellaera.backend.model.Role;
+import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.repository.BookRepository;
+import com.daniellaera.backend.repository.UserRepository;
+import com.daniellaera.backend.service.JwtService;
 import org.flywaydb.test.annotation.FlywayTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -24,6 +32,8 @@ import java.util.Arrays;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -56,15 +66,31 @@ public class BookControllerIT {
         registry.add("spring.datasource.password", postgres::getPassword);
     }
 
+    @Mock
+    private AuthenticationManager authenticationManager;
+
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private BookRepository bookRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private JwtService jwtService; // Inject JwtService to generate the JWT
+
+    private User user;
 
     @BeforeEach
     void setup() {
         bookRepository.deleteAll();
+        userRepository.deleteAll();
+
+        user = new User();
+        user.setEmail("john.doe@example.com");
+        user.setPassword("password");
+        user.setRole(Role.USER);
+        userRepository.save(user);
 
         Book book1 = new Book();
         book1.setTitle("Title 1");
@@ -72,6 +98,7 @@ public class BookControllerIT {
         book1.setIsbn("978-1234567890");
         book1.setAuthor("Thomas H. Cormen");
         book1.setGenre("Fiction");
+        book1.setCreatedBy(user);
 
         LocalDate publishedLocalDate = LocalDate.of(2020, 5, 15); // May 15, 2020
         book1.setPublishedDate(Date.from(publishedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
@@ -85,6 +112,7 @@ public class BookControllerIT {
         book2.setGenre("Programming");
         book2.setPublishedDate(Date.from(publishedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
         book2.setCreatedDate(new Date());
+        book2.setCreatedBy(user);
 
         bookRepository.saveAll(Arrays.asList(book1, book2));
     }
@@ -148,10 +176,19 @@ public class BookControllerIT {
         }
         """;
 
+        String userEmail = "john.doe@example.com";
+        String jwtToken = jwtService.generateToken(userEmail, "USER");
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user, null);
+
+        // Mock authenticationManager to return a valid authentication object
+        when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(authentication);
+
         // Act & Assert
         mockMvc.perform(post("/api/v3/book")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(bookJson))
+                        .content(bookJson)
+                        .header("Authorization", "Bearer " + jwtToken)
+                )
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.title").value("New Book Title"))
