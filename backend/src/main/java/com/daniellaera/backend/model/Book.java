@@ -15,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-
 @Table(name = "_book")
 public class Book {
     @Id
@@ -35,11 +34,15 @@ public class Book {
     @Temporal(TemporalType.DATE) // Represents the book's real-world publication date
     private Date publishedDate;
 
-
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Rating> ratings;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
+
+    private Double averageRating; // Average rating for the book
 }

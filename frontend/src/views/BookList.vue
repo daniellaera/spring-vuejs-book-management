@@ -59,6 +59,19 @@
         </template>
       </Column>
 
+      <!-- Average Rating Column -->
+      <Column header="Average Rating">
+        <template #body="slotProps">
+          <Rating
+            v-model="slotProps.data.averageRating"
+            readonly
+            :stars="5"
+            cancel="false"
+            v-tooltip="slotProps.data.averageRating.toFixed(1)"
+          />
+        </template>
+      </Column>
+
       <!-- Actions Column -->
       <Column header="Actions">
         <template #body="slotProps">
@@ -111,6 +124,7 @@ import { isLoggedIn } from "@/service/useSession";
 import DataTable, { type DataTableSortEvent } from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
+import Rating from 'primevue/rating';
 
 const books = ref<BookDTO[]>([]);
 const loading = ref(true);

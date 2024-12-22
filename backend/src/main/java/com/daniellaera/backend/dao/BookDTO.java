@@ -16,5 +16,7 @@ public class BookDTO {
     private Date createdDate;
     private Date publishedDate;
     private List<CommentDTO> comments;
+    private List<RatingDTO> ratings;
+    private Double averageRating;
     private UserDTO userDTO;
 }

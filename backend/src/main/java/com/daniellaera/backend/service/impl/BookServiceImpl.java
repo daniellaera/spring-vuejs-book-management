@@ -2,9 +2,11 @@ package com.daniellaera.backend.service.impl;
 
 import com.daniellaera.backend.dao.BookDTO;
 import com.daniellaera.backend.dao.CommentDTO;
+import com.daniellaera.backend.dao.RatingDTO;
 import com.daniellaera.backend.dao.UserDTO;
 import com.daniellaera.backend.model.Book;
 import com.daniellaera.backend.model.Comment;
+import com.daniellaera.backend.model.Rating;
 import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.repository.BookRepository;
 import com.daniellaera.backend.repository.UserRepository;
@@ -55,7 +57,9 @@ public class BookServiceImpl implements BookService {
 
         Book book = convertBookDTOToBookEntity(bookDTO);
         book.setCreatedBy(user);
+
         Book savedBook = bookRepository.save(book);
+
         return convertBookEntityToBookDto(savedBook);
     }
 
@@ -71,6 +75,7 @@ public class BookServiceImpl implements BookService {
                     return comment;
                 })
                 .toList();
+
         book.setComments(comments);
         book.setAuthor(bookDTO.getAuthor());
         book.setTitle(bookDTO.getTitle());
@@ -78,6 +83,7 @@ public class BookServiceImpl implements BookService {
         book.setGenre(bookDTO.getGenre());
         book.setDescription(bookDTO.getDescription());
         book.setPublishedDate(bookDTO.getPublishedDate());
+        book.setAverageRating(0.0);
 
         return book;
     }
@@ -98,18 +104,39 @@ public class BookServiceImpl implements BookService {
         bookDto.setGenre(book.getGenre());
         bookDto.setCreatedDate(book.getCreatedDate());
         bookDto.setPublishedDate(book.getPublishedDate());
+
+        // comments
         List<CommentDTO> commentDTOList =
                 (book.getComments() != null) ? book.getComments()
                         .stream()
                         .map(this::convertCommentToCommentDTO)
                         .toList() : List.of();
+
+        // ratings
+        List<RatingDTO> ratingDTOList =
+                (book.getRatings() != null) ? book.getRatings()
+                        .stream()
+                        .map(this::convertRatingToRatingDTO)
+                        .toList() : List.of();
+
         bookDto.setComments(commentDTOList);
+        bookDto.setRatings(ratingDTOList);
+        bookDto.setAverageRating(book.getAverageRating());
 
         UserDTO userDto = new UserDTO();
+        userDto.setId(book.getCreatedBy().getId());
         userDto.setFullName(book.getCreatedBy().getFullName());
         bookDto.setUserDTO(userDto);
 
         return bookDto;
+    }
+
+    private RatingDTO convertRatingToRatingDTO(Rating rating) {
+        RatingDTO ratingDTO = new RatingDTO();
+        ratingDTO.setScore(rating.getScore());
+        ratingDTO.setUserId(rating.getUser().getId());
+
+        return ratingDTO;
     }
 
     private CommentDTO convertCommentToCommentDTO(Comment comment) {

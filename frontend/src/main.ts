@@ -5,6 +5,7 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import 'primeicons/primeicons.css'
 import ToastService from 'primevue/toastservice';
+import Tooltip from "primevue/tooltip";
 
 const app = createApp(App);
 
@@ -18,5 +19,6 @@ app.use(PrimeVue, {
 }); // Register PrimeVue plugin
 app.use(router);   // Register Vue Router
 app.use(ToastService);
+app.directive('tooltip', Tooltip);
 
 app.mount('#app');

@@ -6,7 +6,9 @@ import type { BookDTO } from "@/model/book";
 import CommentList from '@/views/CommentList.vue'; // Import the CommentList component
 import CommentForm from '@/components/CommentForm.vue'; // Import the CommentForm component
 import Card from 'primevue/card'; // Import PrimeVue Card
-import Button from 'primevue/button'; // Import PrimeVue Button
+import Button from 'primevue/button';
+import SubmitRatingForm from "@/components/SubmitRatingForm.vue";
+import { sessionState } from "@/service/useSession"; // Import PrimeVue Button
 
 const book = ref<BookDTO | null>(null);
 const route = useRoute();
@@ -86,6 +88,14 @@ const formatPublishedDate = (date: Date | null) => {
 
         <!-- Render the CommentForm to submit a new comment -->
         <CommentForm :bookId="book.id" @comment-added="fetchBookDetails(book.id)" />
+
+        <SubmitRatingForm
+          v-if="book.userDTO && book.userDTO.id"
+          :session-user-id="sessionState.userDetails.userId ?? 0"
+          :book-id="book.id"
+          :bookRatings="book.ratings"
+          @rating-added="fetchBookDetails(book.id)"
+        />
       </div>
     </template>
     <template #footer>

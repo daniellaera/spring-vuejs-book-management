@@ -1,4 +1,6 @@
 import type {CommentDTO} from "@/model/comment";
+import type {RatingDTO} from "@/model/rating";
+import type {UserDTO} from "@/model/user";
 
 export interface BookDTO {
   title: string;
@@ -8,7 +10,10 @@ export interface BookDTO {
   description: string;
   author: string;
   genre: string;
+  userDTO?: UserDTO;
   comments: CommentDTO[];
+  ratings?: RatingDTO[];
+  averageRating?: number;
   createdDate: Date;
   publishedDate: Date | null; // Allow null only
 }

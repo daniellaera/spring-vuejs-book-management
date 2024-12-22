@@ -125,7 +125,7 @@ const book = ref<BookDTO>({
   genre: "",
   comments: [],
   createdDate: new Date(),
-  publishedDate: null // Use null
+  publishedDate: null
 });
 
 // Computed property for form validation

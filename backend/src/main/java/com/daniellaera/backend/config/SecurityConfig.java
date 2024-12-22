@@ -56,6 +56,7 @@ public class SecurityConfig {
                         //.requestMatchers("/api/v3/auth/logout").hasAuthority("USER")
                         .requestMatchers("/api/v3/book/**").permitAll()
                         .requestMatchers("/api/v3/comment/**").permitAll()
+                        .requestMatchers("/api/v3/rating/**").permitAll()
                 )
                 .oauth2Login(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())

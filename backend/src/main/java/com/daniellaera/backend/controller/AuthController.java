@@ -136,6 +136,7 @@ public class AuthController {
             Map<String, Object> response = new HashMap<>();
             response.put("username", user.getUsername());
             response.put("fullName", user.getFullName());
+            response.put("userId", user.getId());
 
             // Conditionally add githubId if it is not null
             if (user.getGithubId() != null) {
