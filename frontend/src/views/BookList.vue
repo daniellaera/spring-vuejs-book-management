@@ -10,7 +10,7 @@
 
     <!-- DataTable will show once loading is finished -->
     <DataTable v-else
-               :value="books"
+               :value="filteredBooks"
                tableStyle="min-width: 50rem"
                :sortField="sortField"
                :sortOrder="sortOrder"
@@ -28,6 +28,14 @@
         <div class="flex items-center justify-between gap-6">
           <h2 class="text-xl font-bold">Books</h2>
           <Button icon="pi pi-refresh" label="Refresh" rounded raised @click="fetchBooks" />
+          <div>
+            <IconField>
+              <InputIcon>
+                <i class="pi pi-search"/>
+              </InputIcon>
+              <InputText v-model="searchTerm" placeholder="Search by title or ISBN"/>
+            </IconField>
+          </div>
         </div>
       </template>
 
@@ -114,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import apiClient from '@/plugins/axiosConfig';
 import type { BookDTO } from "@/model/book";
@@ -125,6 +133,9 @@ import DataTable, { type DataTableSortEvent } from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 import Rating from 'primevue/rating';
+import InputText from 'primevue/inputtext';
+import InputIcon from 'primevue/inputicon';
+import IconField from 'primevue/iconfield';
 
 const books = ref<BookDTO[]>([]);
 const loading = ref(true);
@@ -132,8 +143,20 @@ const page = ref(0); // Current page index
 const rows = ref(5); // Number of rows per page
 const sortField = ref('publishedDate'); // Current sorting field, default to `publishedDate`
 const sortOrder = ref<number>(1); // Sorting order (1 for ascending, -1 for descending)
+const searchTerm = ref(''); // Search term input
 const totalRecords = ref(0); // Total records count
 const router = useRouter();
+
+// Computed for filtered books based on search
+const filteredBooks = computed(() => {
+  if (searchTerm.value.trim() === '') {
+    return books.value; // If no search term, show all books
+  }
+  return books.value.filter(book =>
+    book.title.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+    book.isbn.includes(searchTerm.value)
+  );
+});
 
 const fetchBooks = async () => {
   loading.value = true;
