@@ -1,5 +1,6 @@
 package com.daniellaera.backend.config;
 
+import com.daniellaera.backend.properties.Oauth2Properties;
 import com.daniellaera.backend.service.impl.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,48 +22,45 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final Oauth2Properties oauth2Properties;
+
+    public SecurityConfig(Oauth2Properties oauth2Properties) {
+        this.oauth2Properties = oauth2Properties;
+    }
+
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
         return new JwtAuthFilter();
     }
 
-    //@Bean
-    //@Order(1)
-    //public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    //    return
-    //            http
-    //                    .cors(withDefaults())
-    //                    .csrf(AbstractHttpConfigurer::disable)
-    //                    .authorizeHttpRequests(request -> request
-    //                            .requestMatchers("/api/v3/auth/**").permitAll() // Public endpoints
-    //                            .requestMatchers("/api/v3/auth/me").hasAuthority("USER")
-    //                            //.requestMatchers("/api/v3/auth/logout").hasAuthority("USER")
-    //                            .requestMatchers("/api/v3/book/**").permitAll()
-    //                            .requestMatchers("/api/v3/comment/**").permitAll()
-    //                    )
-    //                    .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    //                    .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
-    //                    .build();
-    //}
-
     @Bean
-    public SecurityFilterChain securityFilterChainOauth2(HttpSecurity http) throws Exception {
-        return http
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
                 .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v3/auth/**").permitAll() // Public endpoints
                         .requestMatchers("/api/v3/auth/me").hasAuthority("USER")
-                        //.requestMatchers("/api/v3/auth/logout").hasAuthority("USER")
                         .requestMatchers("/api/v3/book/**").permitAll()
                         .requestMatchers("/api/v3/comment/**").permitAll()
                         .requestMatchers("/api/v3/rating/**").permitAll()
+                        .requestMatchers("/api/v3/borrow/**").permitAll()
+                        .requestMatchers("/api/v3/features/**").permitAll()
                 )
-                .oauth2Login(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class) // Add JwtAuthFilter
-                .build();
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class); // Add JwtAuthFilter
+
+        if (oauth2Properties.isEnabled()) {
+            System.out.println("Oauth2 enabled");
+            http
+                    .authorizeHttpRequests(auth -> auth
+                            .requestMatchers("/api/v3/github/**").permitAll()
+                    )
+                    .oauth2Login(Customizer.withDefaults())
+                    .formLogin(Customizer.withDefaults());
+        }
+
+        return http.build();
     }
 
     @Bean

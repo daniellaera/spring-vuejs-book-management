@@ -25,3 +25,8 @@ jwt:
 
 frontend:
   url: ${FRONTEND_URL}  # Frontend URL as environment variable
+
+social:
+  feature:
+    oauth2:
+      enabled: true

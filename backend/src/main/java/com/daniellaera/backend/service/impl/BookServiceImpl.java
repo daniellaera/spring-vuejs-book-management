@@ -1,13 +1,7 @@
 package com.daniellaera.backend.service.impl;
 
-import com.daniellaera.backend.dao.BookDTO;
-import com.daniellaera.backend.dao.CommentDTO;
-import com.daniellaera.backend.dao.RatingDTO;
-import com.daniellaera.backend.dao.UserDTO;
-import com.daniellaera.backend.model.Book;
-import com.daniellaera.backend.model.Comment;
-import com.daniellaera.backend.model.Rating;
-import com.daniellaera.backend.model.User;
+import com.daniellaera.backend.dao.*;
+import com.daniellaera.backend.model.*;
 import com.daniellaera.backend.repository.BookRepository;
 import com.daniellaera.backend.repository.UserRepository;
 import com.daniellaera.backend.service.BookService;
@@ -119,6 +113,10 @@ public class BookServiceImpl implements BookService {
                         .map(this::convertRatingToRatingDTO)
                         .toList() : List.of();
 
+        // borrow
+        BorrowDTO borrowDTO = (book.getBorrow() != null) ? convertBorrowEntityToBorrowDTO(book.getBorrow()) : null;
+        bookDto.setBorrow(borrowDTO);
+
         bookDto.setComments(commentDTOList);
         bookDto.setRatings(ratingDTOList);
         bookDto.setAverageRating(book.getAverageRating());
@@ -129,6 +127,16 @@ public class BookServiceImpl implements BookService {
         bookDto.setUserDTO(userDto);
 
         return bookDto;
+    }
+
+    private BorrowDTO convertBorrowEntityToBorrowDTO(Borrow borrow) {
+        return BorrowDTO.builder()
+                .bookId(borrow.getBook().getId())
+                .userId(borrow.getUser().getId())
+                .isReturned(borrow.getIsReturned())
+                .borrowStartDate(borrow.getBorrowStartDate())
+                .borrowEndDate(borrow.getBorrowEndDate())
+                .build();
     }
 
     private RatingDTO convertRatingToRatingDTO(Rating rating) {

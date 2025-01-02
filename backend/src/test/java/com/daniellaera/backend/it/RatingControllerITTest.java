@@ -1,6 +1,6 @@
 package com.daniellaera.backend.it;
 
-import com.daniellaera.backend.dao.CommentDTO;
+import com.daniellaera.backend.dao.RatingDTO;
 import com.daniellaera.backend.model.Book;
 import com.daniellaera.backend.model.Comment;
 import com.daniellaera.backend.model.Role;
@@ -8,8 +8,8 @@ import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.repository.BookRepository;
 import com.daniellaera.backend.repository.CommentRepository;
 import com.daniellaera.backend.repository.UserRepository;
-import com.daniellaera.backend.service.CommentService;
 import com.daniellaera.backend.service.JwtService;
+import com.daniellaera.backend.service.RatingService;
 import com.daniellaera.backend.utils.TestcontainersConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,16 +32,17 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class CommentControllerIT {
+public class RatingControllerITTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,7 +51,7 @@ public class CommentControllerIT {
     private AuthenticationManager authenticationManager;
 
     @Mock
-    private CommentService commentService;
+    private RatingService ratingService;
 
     @Autowired
     private CommentRepository commentRepository;
@@ -68,13 +69,13 @@ public class CommentControllerIT {
     void setup() {
         commentRepository.deleteAll();
         bookRepository.deleteAll();
-        userRepository.deleteAll();
+        userRepository.deleteAll(); // Ensure all users are deleted
 
         user = new User();
         user.setEmail("john.doe@example.com");
         user.setPassword("password");
         user.setRole(Role.USER);
-        userRepository.save(user);
+        userRepository.save(user); // This will persist a single user with consistent ID
 
         book = new Book();
         book.setTitle("Test Book");
@@ -106,57 +107,35 @@ public class CommentControllerIT {
     }
 
     @Test
-    void getCommentsByBookId_ReturnsComments() throws Exception {
-        mockMvc.perform(get("/api/v3/comment/{bookId}/comments", book.getId())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].content").value("Great book!"))
-                .andExpect(jsonPath("$[1].content").value("I enjoyed it."));
-    }
-
-    @Test
-    void createComment_ReturnsCreatedComment() throws Exception {
-        // Arrange: Mock comment creation
-        CommentDTO newComment = new CommentDTO();
-        newComment.setContent("Another insightful comment.");
-        String newCommentJson = """
-                {
-                    "content": "Another insightful comment."
-                }
-                """;
-
+    //@WithMockUser(username = "john.doe@example.com", roles = "USER")
+    void createRating_Success() throws Exception {
         String userEmail = "john.doe@example.com";
         String jwtToken = jwtService.generateToken(userEmail, "USER");
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, null);
 
-        // Mock authenticationManager to return a valid authentication object
         when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(authentication);
 
-        // Mock the service to return the newly created comment
-        when(commentService.createCommentByBookIdAndUserId(any(Integer.class), any(String.class), any(CommentDTO.class)))
-                .thenReturn(newComment);
+        RatingDTO ratingDTO = new RatingDTO();
+        ratingDTO.setScore(5);
+        ratingDTO.setUserId(user.getId()); // Mock user ID
 
-        // Act: Perform the POST request with JWT token in the Authorization header
-        mockMvc.perform(post("/api/v3/comment/{bookId}", book.getId())
-                        .contentType("application/json")
-                        .accept("application/json")
-                        .content(newCommentJson)
-                        .header("Authorization", "Bearer " + jwtToken)) // Mock JWT token
+        // Mock service behavior
+        when(ratingService.createRatingByBookIdAndUserId(anyInt(), any(String.class), any(RatingDTO.class)))
+                .thenReturn(ratingDTO);
+
+        String requestBody = """
+                {
+                  "score": 5,
+                  "userId": 1
+                }
+                """;
+
+        // Act & Assert
+        mockMvc.perform(post("/api/v3/rating/{bookId}", book.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                        .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.content").value("Another insightful comment."));
-    }
-
-    @Test
-    void getCommentsByBookId_WhenNoComments_ReturnsEmptyArray() throws Exception {
-        commentRepository.deleteAll();
-
-        mockMvc.perform(get("/api/v3/comment/{bookId}/comments", book.getId())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$.score").value(5));
     }
 }

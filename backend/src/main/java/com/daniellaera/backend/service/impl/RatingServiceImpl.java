@@ -78,6 +78,7 @@ public class RatingServiceImpl implements RatingService {
     private RatingDTO convertRatingToRatingDTO(Rating savedRating) {
         RatingDTO ratingDTO = new RatingDTO();
         ratingDTO.setScore(savedRating.getScore());
+        ratingDTO.setUserId(savedRating.getUser().getId());
         return ratingDTO;
     }
 

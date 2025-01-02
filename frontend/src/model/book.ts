@@ -1,6 +1,7 @@
 import type {CommentDTO} from "@/model/comment";
 import type {RatingDTO} from "@/model/rating";
 import type {UserDTO} from "@/model/user";
+import type {BorrowDTO} from "@/model/borrow";
 
 export interface BookDTO {
   title: string;
@@ -16,4 +17,5 @@ export interface BookDTO {
   averageRating?: number;
   createdDate: Date;
   publishedDate: Date | null; // Allow null only
+  borrow?: BorrowDTO;
 }

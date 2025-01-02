@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
 import type { CommentDTO } from '@/model/comment';
 
 // Define props to accept a list of comments

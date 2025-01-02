@@ -1,13 +1,12 @@
 package com.daniellaera.backend.controller;
 
 import com.daniellaera.backend.dao.RatingDTO;
-import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.service.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,14 +31,17 @@ public class RatingController {
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping("/{bookId}")
     public ResponseEntity<RatingDTO> createRating(
-            @AuthenticationPrincipal User currentUser, // Get the logged-in user
+            Authentication authentication, // Get the logged-in user
             @PathVariable Integer bookId,
             @RequestBody RatingDTO ratingDTO) {
-        if (currentUser.getEmail() == null) {
+
+        // Check if authentication is null or not authenticated
+        if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        String userEmail = currentUser.getEmail();
+        String userEmail = authentication.getName();
+
         return ResponseEntity.ok(ratingService.createRatingByBookIdAndUserId(bookId, userEmail, ratingDTO));
     }
 }

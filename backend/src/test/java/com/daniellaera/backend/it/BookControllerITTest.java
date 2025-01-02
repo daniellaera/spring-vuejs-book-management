@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class BookControllerIT {
+public class BookControllerITTest {
 
     @Mock
     private AuthenticationManager authenticationManager;
@@ -137,7 +137,6 @@ public class BookControllerIT {
 
     @Test
     void createBook_CreatesBookSuccessfully() throws Exception {
-        // Arrange
         String bookJson = """
         {
             "title": "New Book Title",
@@ -153,10 +152,8 @@ public class BookControllerIT {
         String jwtToken = jwtService.generateToken(userEmail, "USER");
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, null);
 
-        // Mock authenticationManager to return a valid authentication object
         when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(authentication);
 
-        // Act & Assert
         mockMvc.perform(post("/api/v3/book")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(bookJson)
@@ -171,7 +168,6 @@ public class BookControllerIT {
                 .andExpect(jsonPath("$.genre").value("Science Fiction"))
                 .andExpect(jsonPath("$.publishedDate").value("2023-01-01T00:00:00.000+00:00")); // Ensure the date matches
 
-        // Verify that the book is stored in the database
         assertThat(bookRepository.findAll()).hasSize(3); // Two books from setup + one new book
         Book savedBook = bookRepository.findAll().stream()
                 .filter(book -> "New Book Title".equals(book.getTitle()))

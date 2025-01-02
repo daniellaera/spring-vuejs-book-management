@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -59,10 +58,14 @@ public class CommentServiceImpl implements CommentService {
                     return new EntityNotFoundException("Book not found with ID: " + bookId);
                 });
 
-        Comment comment = new Comment();
-        comment.setBook(book);
-        comment.setUser(user);
-        comment.setContent(commentDTO.getContent());
+        Comment comment = Comment.builder()
+                .book(book)
+                .user(user)
+                .content(commentDTO.getContent())
+                .build();
+        //comment.setBook(book);
+        //comment.setUser(user);
+        //comment.setContent(commentDTO.getContent());
 
         Comment savedComment = commentRepository.save(comment);
         return convertCommentEntityToCommentDTO(savedComment);

@@ -8,13 +8,14 @@
       </Message>
     </div>
     <Button
-      :disabled="!rating"
+      :disabled="!rating || !isLoggedIn"
       @click="submitRating"
       label="Submit Rating"
       class="submit-button"
     />
   </div>
   <p v-else class="info-message">You have already rated this book.</p>
+  <p v-if="!isLoggedIn" class="login-message">Please log in to rate this book.</p>
   <Toast />
 </template>
 
@@ -117,5 +118,11 @@ const submitRating = async () => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.login-message {
+  margin-top: 10px;
+  color: #f44336; /* Red color for the login message */
+  font-size: 0.9rem;
 }
 </style>

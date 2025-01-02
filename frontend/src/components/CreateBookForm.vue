@@ -152,7 +152,6 @@ const submitForm = async () => {
     const response = await apiClient.post("/book", formattedBook, {
       headers: { Authorization: `Bearer ${token}` }, // Pass the token in the header
     });
-    console.log("Book created:", response.data);
 
     toast.add({
       severity: "success",
@@ -191,7 +190,7 @@ const resetForm = () => {
 
 watch(isLoggedIn, (newVal) => {
   if (!newVal) {
-    router.push('/login'); // Redirect to login if session expires
+    router.push('/login');
   }
 });
 </script>

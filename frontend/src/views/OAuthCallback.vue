@@ -26,7 +26,7 @@ onMounted(async () => {
 
   try {
     // Send the code to the backend
-    const response = await apiClient.post('/auth/github/callback', { code });
+    const response = await apiClient.post('/github/callback', { code });
 
     console.log('Received response:', response);  // Log full response for inspection
     const token = response.data.token;

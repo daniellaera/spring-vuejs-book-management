@@ -2,17 +2,20 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import apiClient from '@/plugins/axiosConfig';
-import type { BookDTO } from "@/model/book";
+import type { BookDTO } from "@/model/book"; // Import BookDTO and BorrowDTO
 import CommentList from '@/views/CommentList.vue'; // Import the CommentList component
 import CommentForm from '@/components/CommentForm.vue'; // Import the CommentForm component
 import Card from 'primevue/card'; // Import PrimeVue Card
 import Button from 'primevue/button';
 import SubmitRatingForm from "@/components/SubmitRatingForm.vue";
 import { sessionState } from "@/service/useSession"; // Import PrimeVue Button
+import DatePicker from 'primevue/datepicker';
+import BorrowBookComponent from "@/components/BorrowBookComponent.vue";
 
 const book = ref<BookDTO | null>(null);
 const route = useRoute();
 const router = useRouter();
+const dates = ref<Date[] | [null, null] | null>(null); // Initialize dates
 
 // Fetch book details based on the id from the route
 const fetchBookDetails = async (bookId: number) => {
@@ -24,6 +27,12 @@ const fetchBookDetails = async (bookId: number) => {
   try {
     const response = await apiClient.get(`/book/${bookId}`);
     book.value = response.data;
+
+    // Set dates based on current borrow dates
+    if (book.value?.borrow && !book.value.borrow.isReturned) {
+      dates.value = [new Date(book.value.borrow.borrowStartDate), new Date(book.value.borrow.borrowEndDate)];
+    }
+
   } catch (error) {
     console.error('Error fetching book details:', error);
   }
@@ -46,7 +55,7 @@ const goBack = () => {
   router.push('/');  // Adjust to the correct path
 };
 
-const formatPublishedDate = (date: Date | null) => {
+const formatDate = (date: Date | null) => {
   if (!date) return "Not available";
 
   const parsedDate = new Date(date);
@@ -55,51 +64,158 @@ const formatPublishedDate = (date: Date | null) => {
   return parsedDate.toLocaleDateString("fr-FR"); // Formats as DD/MM/YYYY
 };
 
+const minDate = ref<Date | undefined>(undefined);  // Define minDate as ref
+const maxDate = ref<Date | undefined>(undefined);  // Define maxDate as ref
+
 </script>
 
 <template>
-  <Card
-    style="
-      width: 55rem;
-      margin: 50px auto;
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    "
-  >
+  <Card class="card-container">
     <template #header>
       <img
         alt="Book Header"
         :src="book?.image || `https://picsum.photos/350/150?random=${Math.random()}`"
-        style="width: 100%; height: auto; object-fit: cover; border-radius: 8px;"
+        class="header-image"
       />
     </template>
-    <template #title>{{ book?.title }}</template>
-    <template #subtitle>By {{ book?.author }}</template>
+    <!-- Title Section -->
+    <template #title>
+      <h2 class="book-title">{{ book?.title }}</h2>
+    </template>
+
+    <!-- Subtitle Section -->
+    <template #subtitle>
+      <h3 class="book-subtitle">By {{ book?.author }}</h3>
+    </template>
     <template #content>
       <div v-if="book">
-        <p><strong>ISBN:</strong> {{ book.isbn }}</p>
-        <p><strong>Genre:</strong> {{ book.genre }}</p>
-        <p><strong>Description:</strong> {{ book.description }}</p>
-        <p><strong>Published date:</strong> {{ formatPublishedDate(book.publishedDate) }}</p>
+        <!-- Book Details -->
+        <div class="book-details">
+          <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+          <p><strong>Genre:</strong> {{ book.genre }}</p>
+          <p><strong>Description:</strong> {{ book.description }}</p>
+          <p><strong>Published date:</strong> {{ formatDate(book.publishedDate) }}</p>
+        </div>
 
-        <!-- Render the CommentList component and pass comments -->
-        <CommentList :comments="book.comments" />
+        <!-- Borrow Information Section -->
+        <!-- Date Picker Section -->
+        <div class="card flex justify-center date-picker-section">
+          <p v-if="book.borrow && !book.borrow.isReturned">
+            <strong>Currently Borrowed:</strong>
+            <br />
+            <DatePicker
+              v-model="dates"
+              selectionMode="range"
+              format="dd/mm/yy"
+              inline
+              showWeek
+              class="date-picker"
+              placeholder="Select Date Range"
+              :manualInput="false"
+              :minDate="minDate"
+              :maxDate="maxDate"
+            />
+          </p>
+          <div v-else>
+            <p>No one is currently borrowing this book.</p>
+            <BorrowBookComponent
+              :book-id="book.id"
+              :minDate="minDate"
+              :maxDate="maxDate"
+              @borrow-range-updated="fetchBookDetails(book.id)"
+            />
+          </div>
+        </div>
 
-        <!-- Render the CommentForm to submit a new comment -->
-        <CommentForm :bookId="book.id" @comment-added="fetchBookDetails(book.id)" />
+        <!-- Comments Section -->
+        <div class="comments-section">
+          <CommentList :comments="book.comments" />
+        </div>
 
-        <SubmitRatingForm
-          v-if="book.userDTO && book.userDTO.id"
-          :session-user-id="sessionState.userDetails.userId ?? 0"
-          :book-id="book.id"
-          :bookRatings="book.ratings"
-          @rating-added="fetchBookDetails(book.id)"
-        />
+        <!-- Add Comment Section -->
+        <div class="add-comment-section">
+          <CommentForm :bookId="book.id" @comment-added="fetchBookDetails(book.id)" />
+        </div>
+
+        <!-- Submit Rating Section -->
+        <div v-if="book.userDTO && book.userDTO.id" class="submit-rating-section">
+          <SubmitRatingForm
+            :session-user-id="sessionState.userDetails.userId ?? 0"
+            :book-id="book.id"
+            :bookRatings="book.ratings"
+            @rating-added="fetchBookDetails(book.id)"
+          />
+        </div>
       </div>
     </template>
     <template #footer>
-      <Button label="Back to Books" class="w-full" @click="goBack" />
+      <Button
+        label="Back to Books"
+        class="footer-button"
+        icon="pi pi-arrow-left"
+        iconPos="left"
+        @click="goBack"
+      />
     </template>
   </Card>
 </template>
+
+<style scoped>
+.card-container {
+  width: 55rem;
+  margin: 50px auto;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.book-title {
+  margin-bottom: 0.5rem;
+}
+
+.book-subtitle {
+  margin-bottom: 1rem;
+  color: gray;
+}
+
+.book-details {
+  margin-bottom: 2rem;
+}
+
+.date-picker-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.date-picker {
+  width: 100%;
+  max-width: 30rem;
+}
+
+.comments-section {
+  margin-bottom: 2rem;
+}
+
+.add-comment-section {
+  margin-bottom: 2rem;
+}
+
+.submit-rating-section {
+  margin-bottom: 2rem;
+}
+
+.footer-button {
+  margin-top: 1rem;
+}
+
+</style>

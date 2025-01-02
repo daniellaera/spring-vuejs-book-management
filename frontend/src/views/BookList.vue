@@ -40,19 +40,36 @@
       </template>
 
       <!-- ISBN Column -->
-      <Column field="isbn" header="ISBN" sortable></Column>
+      <Column field="isbn" header="ISBN" :sortable="true"></Column>
 
       <!-- Title Column -->
-      <Column field="title" header="Title" sortable></Column>
+      <Column field="title" header="Title" :sortable="true"></Column>
 
       <!-- Published Date Column -->
       <Column
         field="publishedDate"
         header="Published Date"
-        sortable
+        :sortable="true"
       >
         <template #body="slotProps">
           {{ formatDate(slotProps.data.publishedDate) }}
+        </template>
+      </Column>
+
+      <Column header="Borrow Status">
+        <template #body="slotProps">
+          <div class="borrow-status">
+            <i
+              v-if="slotProps.data.borrow"
+              class="pi pi-check-circle text-green-500"
+              v-tooltip="'Borrowed'"
+            ></i>
+            <i
+              v-else
+              class="pi pi-times-circle text-red-500"
+              v-tooltip="'Available'"
+            ></i>
+          </div>
         </template>
       </Column>
 

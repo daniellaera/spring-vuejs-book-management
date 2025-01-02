@@ -63,8 +63,9 @@
 
       <!-- OAuth Login Options -->
       <div class="oauth-buttons">
-        <p>Or log in with:</p>
+        <p v-if="oauth2Enabled">Or log in with:</p>
         <PrimeButton
+          v-if="oauth2Enabled"
           @click="redirectToGithubOAuth"
           type="button"
           label="GitHub"
@@ -75,6 +76,7 @@
         </PrimeButton>
       </div>
 
+
       <!-- Register Link -->
       <div class="register-link">
         <p>Don't have an account? <RouterLink to="/signup">Register</RouterLink></p>
@@ -84,7 +86,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import {defineComponent, onMounted, ref} from 'vue';
 import InputText from 'primevue/inputtext';
 import PrimeButton from 'primevue/button';
 import Message from 'primevue/message';
@@ -112,6 +114,8 @@ export default defineComponent({
       email: '',
       password: ''
     });
+
+    const oauth2Enabled = ref(false); // State to hold the oauth2Enabled value
 
     // Form validation logic
     const validateForm = () => {
@@ -152,7 +156,7 @@ export default defineComponent({
 
     // Redirect to GitHub OAuth
     const redirectToGithubOAuth = () => {
-      apiClient.get('/auth/github/login')
+      apiClient.get('/github/login')
         .then(response => {
           window.location.href = response.data.authUrl;
         })
@@ -161,6 +165,22 @@ export default defineComponent({
         });
     };
 
+    // Fetch oauth2Enabled status
+    const fetchOauth2Status = async () => {
+      try {
+        const response = await apiClient.get('/features');
+        oauth2Enabled.value = response.data.oauth2Enabled;
+        console.log('github feature is ', oauth2Enabled.value)
+      } catch (error) {
+        console.error('Failed to fetch OAuth2 status', error);
+      }
+    };
+
+    // Fetch status on component mount
+    onMounted(() => {
+      fetchOauth2Status();
+    });
+
     return {
       loginData,
       handleLogin,
@@ -168,6 +188,7 @@ export default defineComponent({
       errors,
       validateForm, // Return validateForm so it can be used in the template
       redirectToGithubOAuth,
+      oauth2Enabled
     };
   }
 });
