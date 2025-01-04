@@ -6,6 +6,7 @@ import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.repository.BookRepository;
 import com.daniellaera.backend.repository.UserRepository;
 import com.daniellaera.backend.service.impl.BookServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -151,5 +152,35 @@ public class BookServiceTest {
 
         assertThat(exception.getMessage()).isEqualTo("User not found with email: nonexistent@example.com");
         verify(bookRepository, never()).save(any(Book.class));
+    }
+
+    @Test
+    void deleteBook_ShouldDeleteBookSuccessfully() {
+        int bookId = 1;
+
+        Book book = new Book();
+        book.setId(bookId);
+        book.setTitle("Test Book");
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+
+        bookService.deleteBook(bookId);
+
+        verify(bookRepository, times(1)).delete(book);
+    }
+
+    @Test
+    void deleteBook_ShouldThrowExceptionIfBookNotFound() {
+        int bookId = 1;
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+
+        Exception exception = org.junit.jupiter.api.Assertions.assertThrows(
+                EntityNotFoundException.class,
+                () -> bookService.deleteBook(bookId)
+        );
+
+        assertThat(exception.getMessage()).isEqualTo("Book not found with id: " + bookId);
+        verify(bookRepository, never()).delete(any(Book.class));
     }
 }

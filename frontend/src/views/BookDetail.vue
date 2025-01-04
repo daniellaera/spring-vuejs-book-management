@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import {ref, onMounted, computed} from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import apiClient from '@/plugins/axiosConfig';
 import type { BookDTO } from "@/model/book"; // Import BookDTO and BorrowDTO
@@ -11,11 +11,87 @@ import SubmitRatingForm from "@/components/SubmitRatingForm.vue";
 import { sessionState } from "@/service/useSession"; // Import PrimeVue Button
 import DatePicker from 'primevue/datepicker';
 import BorrowBookComponent from "@/components/BorrowBookComponent.vue";
+import ConfirmDialog from 'primevue/confirmdialog';
+import Toast from 'primevue/toast';
+
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+
+const confirm = useConfirm();
+const toast = useToast();
 
 const book = ref<BookDTO | null>(null);
 const route = useRoute();
 const router = useRouter();
 const dates = ref<Date[] | [null, null] | null>(null); // Initialize dates
+const minDate = ref<Date | undefined>(undefined);  // Define minDate as ref
+const maxDate = ref<Date | undefined>(undefined);  // Define maxDate as ref
+
+const confirmDelete = (bookId?: number) => {
+  confirm.require({
+    message: 'Do you want to delete this book?',
+    header: 'Delete book',
+    icon: 'pi pi-info-circle',
+    rejectLabel: 'Cancel',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Delete',
+      severity: 'danger'
+    },
+    accept: () => {
+      toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+      deleteBook(bookId);
+    },
+    reject: () => {
+      toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+    }
+  });
+};
+
+// Check if the logged-in user is the owner of the book
+const isOwner = computed(() => {
+  return book.value?.userDTO?.id === sessionState.userDetails.userId;
+});
+
+// Handle delete book
+const deleteBook = async (bookId?: number) => {
+  if (!bookId) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Invalid book ID. Unable to delete.',
+      life: 3000,
+    });
+    return;
+  }
+  try {
+    // get the token
+    const token = localStorage.getItem('auth_token');
+
+    await apiClient.delete(`/book/${bookId}`, {
+      headers: { Authorization : `Bearer ${token}` }
+    });
+    toast.add({
+      severity: 'success',
+      summary: 'Deleted',
+      detail: 'The book has been deleted successfully!',
+      life: 3000,
+    });
+    await router.push('/'); // Redirect to the book list after deletion
+  } catch (error) {
+    console.error('Error deleting book:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to delete the book. Please try again.',
+      life: 3000,
+    });
+  }
+};
 
 // Fetch book details based on the id from the route
 const fetchBookDetails = async (bookId: number) => {
@@ -63,9 +139,6 @@ const formatDate = (date: Date | null) => {
 
   return parsedDate.toLocaleDateString("fr-FR"); // Formats as DD/MM/YYYY
 };
-
-const minDate = ref<Date | undefined>(undefined);  // Define minDate as ref
-const maxDate = ref<Date | undefined>(undefined);  // Define maxDate as ref
 
 </script>
 
@@ -156,6 +229,19 @@ const maxDate = ref<Date | undefined>(undefined);  // Define maxDate as ref
         iconPos="left"
         @click="goBack"
       />
+      <!-- Conditionally render delete button for owner -->
+      <div v-if="isOwner" class="owner-actions">
+        <Button
+          label="Delete Book"
+          class="p-button-danger p-button-rounded"
+          icon="pi pi-trash"
+          iconPos="left"
+          @click="confirmDelete(book?.id)"
+        />
+      </div>
+      <!-- ConfirmDialog for Delete -->
+      <ConfirmDialog />
+      <Toast />
     </template>
   </Card>
 </template>
@@ -216,6 +302,23 @@ const maxDate = ref<Date | undefined>(undefined);  // Define maxDate as ref
 
 .footer-button {
   margin-top: 1rem;
+}
+
+.owner-actions {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.p-button-danger {
+  background: linear-gradient(to right, #ff416c, #ff4b2b);
+  border: none;
+  color: white;
+  transition: transform 0.2s;
+}
+
+.p-button-danger:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(255, 75, 43, 0.5);
 }
 
 </style>

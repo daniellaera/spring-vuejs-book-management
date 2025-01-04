@@ -5,6 +5,7 @@ import com.daniellaera.backend.model.*;
 import com.daniellaera.backend.repository.BookRepository;
 import com.daniellaera.backend.repository.UserRepository;
 import com.daniellaera.backend.service.BookService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -55,6 +56,16 @@ public class BookServiceImpl implements BookService {
         Book savedBook = bookRepository.save(book);
 
         return convertBookEntityToBookDto(savedBook);
+    }
+
+    @Override
+    public void deleteBook(Integer bookId) {
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> {
+            log.error("Book not found with id: {}", bookId);
+            return new EntityNotFoundException("Book not found with id: " + bookId);
+        });
+        bookRepository.delete(book);
+        log.info("Book with id: {} deleted", bookId);
     }
 
     private Book convertBookDTOToBookEntity(BookDTO bookDTO) {

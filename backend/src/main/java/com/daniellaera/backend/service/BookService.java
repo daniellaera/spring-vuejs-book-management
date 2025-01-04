@@ -14,4 +14,6 @@ public interface BookService {
     Optional<BookDTO> findBookById(Integer bookId);
 
     BookDTO createBook(BookDTO book, String userEmail);
+
+    void deleteBook(Integer bookId);
 }
