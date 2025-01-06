@@ -28,10 +28,10 @@ public class NameGenerator {
     public static String generateRandomName() {
         String adjective = ADJECTIVES[RANDOM.nextInt(ADJECTIVES.length)];
         String noun = NOUNS[RANDOM.nextInt(NOUNS.length)];
-        return adjective + noun;
+        return adjective + " " + noun;
     }
 
     public static String generateUniqueSuffix() {
-        return Long.toHexString(System.currentTimeMillis()).substring(6); // Short unique suffix
+        return Long.toHexString(System.currentTimeMillis()) + Integer.toHexString(new Random().nextInt(1000));
     }
 }
