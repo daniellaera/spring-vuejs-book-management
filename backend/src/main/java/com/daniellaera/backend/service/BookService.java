@@ -16,4 +16,6 @@ public interface BookService {
     BookDTO createBook(BookDTO book, String userEmail);
 
     void deleteBook(Integer bookId);
+
+    void updateExpiredBookStatus();
 }

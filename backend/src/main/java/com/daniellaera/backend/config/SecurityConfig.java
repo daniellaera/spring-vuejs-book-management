@@ -28,6 +28,9 @@ public class SecurityConfig {
         this.oauth2Properties = oauth2Properties;
     }
 
+    // SO article: https://stackoverflow.com/questions/76989057/spring-with-both-oauth2login-and-basic-authentication
+    // https://rameshfadatare.medium.com/spring-boot-security-jwt-authentication-tutorial-306fbc3663ea
+
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
         return new JwtAuthFilter();

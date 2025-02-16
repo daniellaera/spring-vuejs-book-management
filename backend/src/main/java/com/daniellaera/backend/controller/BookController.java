@@ -33,8 +33,14 @@ public class BookController {
 
     @GetMapping("{bookId}")
     public ResponseEntity<BookDTO> getBook(@PathVariable Integer bookId) {
-        BookDTO book = bookService.findBookById(bookId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
-        return ResponseEntity.ok().body(book);
+        //return bookService.findBookById(bookId)
+        //        .map(ResponseEntity::ok)
+        //        .orElseGet(() -> ResponseEntity.notFound().build());
+        return bookService.findBookById(bookId)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
+        //BookDTO book = bookService.findBookById(bookId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
+        //return ResponseEntity.ok().body(book);
     }
 
     @PostMapping

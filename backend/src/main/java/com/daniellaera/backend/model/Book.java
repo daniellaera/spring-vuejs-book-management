@@ -40,12 +40,14 @@ public class Book {
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Rating> ratings;
 
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
-    private Borrow borrow; // One-to-One relationship with Borrow
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Borrow> borrows;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
-    private Double averageRating; // Average rating for the book
+    private Double averageRating;
+
+    private Boolean isAvailable = true;
 }

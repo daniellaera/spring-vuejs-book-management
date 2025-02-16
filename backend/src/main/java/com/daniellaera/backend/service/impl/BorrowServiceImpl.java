@@ -8,6 +8,7 @@ import com.daniellaera.backend.repository.BookRepository;
 import com.daniellaera.backend.repository.UserRepository;
 import com.daniellaera.backend.service.BorrowService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,6 +29,11 @@ public class BorrowServiceImpl implements BorrowService {
         this.borrowRepository = borrowRepository;
     }
 
+    /**
+     * Since you are modifying both Borrow and Book entities in a single operation,
+     * it’s a good idea to wrap the method in a transactional context to avoid partial updates if an exception is thrown:
+     */
+    @Transactional
     @Override
     public BorrowDTO createBorrowByBookIdAndUserId(Integer bookId, String userEmail, BorrowDTO borrowDTO) {
         log.info("Loading user by username: {}", userEmail);
@@ -44,8 +50,18 @@ public class BorrowServiceImpl implements BorrowService {
                     return new EntityNotFoundException("Book not found with ID: " + bookId);
                 });
 
-        if (book.getBorrow() != null && !book.getBorrow().getIsReturned()) {
+        // Check if the book is already borrowed and not returned
+        boolean isAlreadyBorrowed = book.getBorrows()
+                .stream()
+                .anyMatch(borrow -> !borrow.getIsReturned());
+
+        if (isAlreadyBorrowed) {
             throw new IllegalStateException("Book is already borrowed and not yet returned.");
+        }
+
+        // Validate borrow dates
+        if (borrowDTO.getBorrowStartDate().after(borrowDTO.getBorrowEndDate())) {
+            throw new IllegalArgumentException("Borrow start date cannot be after the borrow end date.");
         }
 
         Borrow borrow = new Borrow();
@@ -56,11 +72,13 @@ public class BorrowServiceImpl implements BorrowService {
         borrow.setBorrowEndDate(borrowDTO.getBorrowEndDate());
 
         Borrow savedBorrow = borrowRepository.save(borrow);
-
         log.info("Successfully created Borrow record for Book ID: {} and User ID: {}", bookId, user.getId());
 
-        return convertBorrowToBorrowDTO(savedBorrow);
+        book.setIsAvailable(false);
+        bookRepository.save(book);
+        log.info("Setting Book with ID: {} to unavailable (isAvailable = false)", bookId);
 
+        return convertBorrowToBorrowDTO(savedBorrow);
     }
 
     @Override

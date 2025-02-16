@@ -6,11 +6,12 @@ import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.repository.BookRepository;
 import com.daniellaera.backend.repository.UserRepository;
 import com.daniellaera.backend.service.impl.BookServiceImpl;
+import com.daniellaera.backend.service.impl.BorrowRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -28,14 +29,26 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class BookServiceTest {
 
-    @InjectMocks
     private BookServiceImpl bookService;
+
+    // todo is it better for test or ...
+    // @InjectMocks
+    // private BookServiceImpl bookServiceImpl;
 
     @Mock
     private UserRepository userRepository;
 
     @Mock
     private BookRepository bookRepository;
+
+    @Mock
+    private BorrowRepository borrowRepository;
+
+    @BeforeEach
+    public void setUp() {
+        // to remove in case we @InjectMocks of bookServiceImpl
+        bookService = new BookServiceImpl(bookRepository, userRepository, borrowRepository);
+    }
 
     @Test
     void getAllBooks_ShouldReturnPagedBooks() {

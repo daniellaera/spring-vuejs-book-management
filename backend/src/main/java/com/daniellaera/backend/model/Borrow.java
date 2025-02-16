@@ -1,7 +1,6 @@
 package com.daniellaera.backend.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,12 +25,11 @@ public class Borrow {
     private Date borrowStartDate;
 
     @Temporal(TemporalType.DATE)
-    @FutureOrPresent(message = "Borrow end date must be in the future or present")
     private Date borrowEndDate;
 
     private Boolean isReturned;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 

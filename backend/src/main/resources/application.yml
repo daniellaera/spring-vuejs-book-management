@@ -30,3 +30,7 @@ social:
   feature:
     oauth2:
       enabled: true
+
+quartz:
+  scheduler:
+    cron: "0 0 0 * * ?"  # Every day at midnight

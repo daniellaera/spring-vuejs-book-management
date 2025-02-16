@@ -13,6 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,11 +25,15 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
+    private final BorrowRepository borrowRepository;
 
     @Autowired
-    public BookServiceImpl(BookRepository bookRepository, UserRepository userRepository) {
+    public BookServiceImpl(BookRepository bookRepository,
+                           UserRepository userRepository,
+                           BorrowRepository borrowRepository) {
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
+        this.borrowRepository = borrowRepository;
     }
 
     @Override
@@ -66,6 +73,46 @@ public class BookServiceImpl implements BookService {
         });
         bookRepository.delete(book);
         log.info("Book with id: {} deleted", bookId);
+    }
+
+    @Override
+    public void updateExpiredBookStatus() {
+        // Convert LocalDate.now() to Date for compatibility
+        Date currentDate = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        // Fetch only books with borrow end date before the current date AND isAvailable = false
+        List<Book> expiredBorrowBooks = bookRepository.findByBorrows_BorrowEndDateBeforeAndIsAvailableFalse(currentDate);
+
+        // Check if there are any expired books
+        if (expiredBorrowBooks.isEmpty()) {
+            log.info("No expired books to update.");
+            return;
+        }
+
+        // Update the status of each expired borrow in those books
+        for (Book book : expiredBorrowBooks) {
+            List<Borrow> borrows = book.getBorrows();
+
+            // Find the active borrow (if any) that has expired
+            Borrow activeBorrow = borrows
+                    .stream()
+                    .filter(brw -> brw.getBorrowEndDate().before(currentDate) && !brw.getIsReturned())
+                    .findFirst()
+                    .orElse(null);
+
+            if (activeBorrow != null) {
+                log.debug("Updating book with ID: {} and borrow with ID: {}", book.getId(), activeBorrow.getId());
+                // Mark borrow as returned and book as available
+                activeBorrow.setIsReturned(true);
+                book.setIsAvailable(true);
+
+                // Save changes to both borrow and book
+                borrowRepository.save(activeBorrow);
+                bookRepository.save(book);
+            }
+        }
+
+        log.info("Updated {} books to available.", expiredBorrowBooks.size());
     }
 
     private Book convertBookDTOToBookEntity(BookDTO bookDTO) {
@@ -111,21 +158,27 @@ public class BookServiceImpl implements BookService {
         bookDto.setPublishedDate(book.getPublishedDate());
 
         // comments
-        List<CommentDTO> commentDTOList =
-                (book.getComments() != null) ? book.getComments()
+        List<CommentDTO> commentDTOList = (book.getComments() != null) ? book.getComments()
                         .stream()
                         .map(this::convertCommentToCommentDTO)
                         .toList() : List.of();
 
         // ratings
-        List<RatingDTO> ratingDTOList =
-                (book.getRatings() != null) ? book.getRatings()
+        List<RatingDTO> ratingDTOList = (book.getRatings() != null) ? book.getRatings()
                         .stream()
                         .map(this::convertRatingToRatingDTO)
                         .toList() : List.of();
 
         // borrow
-        BorrowDTO borrowDTO = (book.getBorrow() != null) ? convertBorrowEntityToBorrowDTO(book.getBorrow()) : null;
+        BorrowDTO borrowDTO = Optional.ofNullable(book.getBorrows())
+                .orElse(List.of()) // Provide an empty list if `null`
+                .stream()
+                .filter(brw -> Boolean.FALSE.equals(brw.getIsReturned()))
+                .findFirst()
+                .map(this::convertBorrowEntityToBorrowDTO)
+                .orElse(null);
+
+        // BorrowDTO borrowDTO = (book.getBorrow() != null) ? convertBorrowEntityToBorrowDTO(book.getBorrow()) : null;
         bookDto.setBorrow(borrowDTO);
 
         bookDto.setComments(commentDTOList);
@@ -136,6 +189,7 @@ public class BookServiceImpl implements BookService {
         userDto.setId(book.getCreatedBy().getId());
         userDto.setFullName(book.getCreatedBy().getFullName());
         bookDto.setUserDTO(userDto);
+        bookDto.setIsAvailable(book.getIsAvailable());
 
         return bookDto;
     }

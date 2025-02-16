@@ -60,7 +60,7 @@
         <template #body="slotProps">
           <div class="borrow-status">
             <i
-              v-if="slotProps.data.borrow"
+              v-if="slotProps.data.borrow && !slotProps.data.borrow.isReturned"
               class="pi pi-check-circle text-green-500"
               v-tooltip="'Borrowed'"
             ></i>

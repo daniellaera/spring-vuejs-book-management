@@ -20,4 +20,5 @@ public class BookDTO {
     private BorrowDTO borrow;
     private Double averageRating;
     private UserDTO userDTO;
+    private Boolean isAvailable;
 }

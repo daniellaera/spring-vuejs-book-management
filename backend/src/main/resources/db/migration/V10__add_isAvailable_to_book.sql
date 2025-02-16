@@ -1,0 +1,2 @@
+ALTER TABLE _book
+    ADD COLUMN is_available BOOLEAN DEFAULT TRUE;
