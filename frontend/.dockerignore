@@ -29,4 +29,3 @@ cypress/screenshots
 **/*.sw?
 
 **/*.tsbuildinfo
-fly.toml
