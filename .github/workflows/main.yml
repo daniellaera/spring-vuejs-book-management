@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  packages: write  # Required for GHCR
 
 jobs:
   deploy:
