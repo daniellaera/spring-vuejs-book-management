@@ -22,5 +22,4 @@ app.use(router); // Register Vue Router
 app.use(ToastService);
 app.directive('tooltip', Tooltip);
 app.use(ConfirmationService);
-
 app.mount('#app');

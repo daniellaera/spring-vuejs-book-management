@@ -13,7 +13,7 @@ import NavBar from '@/views/NavBar.vue';
 import {onMounted} from 'vue';
 import {checkSession} from "@/service/useSession";
 
-// Call checkSession to ensure session is restored on page reload or app load
+// Call checkSession to ensure the session is restored on page reload or app load
 onMounted(() => {
   checkSession(); // This restores the session state on app load or refresh
 });

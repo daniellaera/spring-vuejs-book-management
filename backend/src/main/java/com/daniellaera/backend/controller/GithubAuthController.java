@@ -87,7 +87,7 @@ public class GithubAuthController {
 
             if (userResponse.getBody() != null) {
                 String email = (userResponse.getBody().get("email") != null) ? userResponse.getBody().get("email").toString() : "no-email-found";
-                String githubId = userResponse.getBody().get("id").toString(); // Unique GitHub user ID
+                String githubId = userResponse.getBody().get("id").toString(); // Unique GitHub User ID
                 String username = userResponse.getBody().get("name") != null ? userResponse.getBody().get("name").toString() : githubId;
 
                 try {
