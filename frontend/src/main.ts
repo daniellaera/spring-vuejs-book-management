@@ -18,7 +18,7 @@ app.use(PrimeVue, {
     },
   }
 }); // Register PrimeVue plugin
-app.use(router);   // Register Vue Router
+app.use(router); // Register Vue Router
 app.use(ToastService);
 app.directive('tooltip', Tooltip);
 app.use(ConfirmationService);
