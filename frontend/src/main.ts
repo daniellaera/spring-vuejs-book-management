@@ -14,7 +14,7 @@ app.use(PrimeVue, {
   theme: {
     preset: Aura,
     options: {
-      darkModeSelector: '.my-app-dark',  // This selector triggers dark mode
+      darkModeSelector: '.my-app-dark', // This selector triggers dark mode
     },
   }
 }); // Register PrimeVue plugin

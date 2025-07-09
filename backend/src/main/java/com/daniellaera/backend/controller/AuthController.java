@@ -51,7 +51,7 @@ public class AuthController {
             response.put("fullName", user.getFullName());
             response.put("userId", user.getId());
 
-            // Conditionally add githubId if it is not null
+            // Conditionally add github Id if it's not null
             if (user.getGithubId() != null) {
                 response.put("githubId", user.getGithubId());
             }
