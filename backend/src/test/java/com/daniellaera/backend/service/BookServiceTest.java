@@ -72,7 +72,7 @@ public class BookServiceTest {
 
         assertThat(result.getTotalElements()).isEqualTo(1);
         assertThat(result.getContent().getFirst().getTitle()).isEqualTo("Test Book");
-        assertThat(result.getContent().getFirst().getUserDTO().getFullName()).isEqualTo("John Doe"); // Verify createdBy
+        assertThat(result.getContent().getFirst().getUserDTO().getFullName()).isEqualTo("John Doe");
         verify(bookRepository, times(1)).findAll(any(PageRequest.class));
     }
 

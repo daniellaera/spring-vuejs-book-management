@@ -17,7 +17,7 @@ app.use(PrimeVue, {
       darkModeSelector: '.my-app-dark', // This selector triggers dark mode
     },
   }
-}); // Register PrimeVue plugin
+});
 app.use(router); // Register Vue Router
 app.use(ToastService);
 app.directive('tooltip', Tooltip);
