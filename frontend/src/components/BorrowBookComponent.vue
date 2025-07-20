@@ -26,7 +26,6 @@ const areDatesValid = computed(() => {
   return !selectedDates.value || !selectedDates.value[0] || !selectedDates.value[1]
 });
 
-// Function to submit borrow request
 const submitBorrowRequest = async () => {
   if (!selectedDates.value || !selectedDates.value[0] || !selectedDates.value[1]) {
     toast.add({

@@ -67,6 +67,6 @@ public class BookController {
         }
 
         bookService.deleteBook(bookId);
-        return ResponseEntity.noContent().build(); // HTTP 204: No Content
+        return ResponseEntity.noContent().build();
     }
 }
