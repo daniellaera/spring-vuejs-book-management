@@ -63,9 +63,6 @@ public class CommentServiceImpl implements CommentService {
                 .user(user)
                 .content(commentDTO.getContent())
                 .build();
-        //comment.setBook(book);
-        //comment.setUser(user);
-        //comment.setContent(commentDTO.getContent());
 
         Comment savedComment = commentRepository.save(comment);
         return convertCommentEntityToCommentDTO(savedComment);

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { isLoggedIn } from "@/service/useSession"; // Import the session management
-import apiClient from '@/plugins/axiosConfig'; // Axios configuration
+import apiClient from '@/plugins/axiosConfig';
 
 // Props for the bookId
 const props = defineProps({
