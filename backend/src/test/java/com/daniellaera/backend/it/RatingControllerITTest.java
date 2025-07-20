@@ -87,7 +87,7 @@ public class RatingControllerITTest {
         LocalDate publishedLocalDate = LocalDate.of(2020, 5, 15); // May 15, 2020
         book.setPublishedDate(Date.from(publishedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-        book.setCreatedDate(new Date()); // Current date and time
+        book.setCreatedDate(new Date());
         book.setCreatedBy(user);
         bookRepository.save(book);
 
