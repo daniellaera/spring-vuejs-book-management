@@ -30,7 +30,7 @@ public class BorrowController {
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping("/{bookId}")
     public ResponseEntity<BorrowDTO> createBorrow(
-            Authentication authentication, // Get the logged-in user
+            Authentication authentication,
             @PathVariable Integer bookId,
             @RequestBody BorrowDTO borrowDTO) {
 

@@ -62,7 +62,6 @@ const canRate = computed(() => {
   );
 });
 
-// Function to submit a rating
 const submitRating = async () => {
   if (rating.value === null) {
     errorMessage.value = "Please select a rating before submitting.";
@@ -122,7 +121,7 @@ const submitRating = async () => {
 
 .login-message {
   margin-top: 10px;
-  color: #f44336; /* Red color for the login message */
+  color: #f44336;
   font-size: 0.9rem;
 }
 </style>

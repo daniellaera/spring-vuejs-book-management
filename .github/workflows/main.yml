@@ -129,11 +129,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure Maven Settings for Docker Build
-        run: |
-          mkdir -p ~/.m2
-          echo "${{ secrets.MAVEN_SETTINGS_XML }}" | base64 --decode > ~/.m2/settings.xml
-
       - name: Set up QEMU for multi-arch
         uses: docker/setup-qemu-action@v2
 
@@ -153,6 +148,8 @@ jobs:
           context: ./backend
           platforms: linux/amd64,linux/arm64
           push: true
+          build-args: |
+            MAVEN_SETTINGS_XML=${{ secrets.MAVEN_SETTINGS_XML }}
           tags: |
             ghcr.io/daniellaera/book-backend:latest
 
