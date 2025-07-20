@@ -68,10 +68,8 @@ public class BookServiceTest {
         Page<Book> page = new PageImpl<>(List.of(book));
         when(bookRepository.findAll(any(PageRequest.class))).thenReturn(page);
 
-        // Act
         Page<BookDTO> result = bookService.getAllBooks(PageRequest.of(0, 10));
 
-        // Assert
         assertThat(result.getTotalElements()).isEqualTo(1);
         assertThat(result.getContent().getFirst().getTitle()).isEqualTo("Test Book");
         assertThat(result.getContent().getFirst().getUserDTO().getFullName()).isEqualTo("John Doe"); // Verify createdBy

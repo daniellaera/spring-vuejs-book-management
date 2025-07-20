@@ -1,5 +1,8 @@
 FROM maven:3.9.9-eclipse-temurin-21-alpine as maven-builder
 
+# 👇 Copy Maven settings into the container
+COPY .m2/settings.xml /root/.m2/settings.xml
+
 COPY src /app/src
 
 COPY pom.xml /app
@@ -14,4 +17,4 @@ WORKDIR /app-service
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","backend-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "backend-0.0.1-SNAPSHOT.jar"]
