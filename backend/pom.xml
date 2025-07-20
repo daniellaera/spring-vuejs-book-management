@@ -14,6 +14,18 @@
 	<name>backend</name>
 	<description>Spring Boot backend for Security</description>
 	<url/>
+	<!-- distributionManagement for deployment, Self-hosted Nexus instance (not affiliated with any company) -->
+	<distributionManagement>
+		<repository>
+			<id>nexus-releases</id>
+			<url>https://nexus.daniellaera.com/repository/maven-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<url>https://nexus.daniellaera.com/repository/maven-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<licenses>
 		<license/>
 	</licenses>

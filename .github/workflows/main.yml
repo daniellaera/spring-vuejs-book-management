@@ -45,6 +45,19 @@ jobs:
       - name: Build and Test Backend
         working-directory: ./backend
         run: mvn clean verify
+          
+      - name: Configure Maven Settings
+        run: |
+          mkdir -p ~/.m2
+          echo "${{ secrets.MAVEN_SETTINGS_XML }}" | base64 --decode > ~/.m2/settings.xml
+
+      - name: Set release version
+        working-directory: ./backend
+        run: mvn versions:set -DnewVersion=1.0.${{ github.run_number }}
+
+      - name: Deploy to Nexus
+        working-directory: ./backend
+        run: mvn clean deploy -Prelease
 
       - name: Upload JaCoCo Coverage Report (Backend)
         uses: actions/upload-artifact@v4
