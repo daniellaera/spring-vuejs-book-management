@@ -31,7 +31,7 @@ const router = createRouter({
       component: LoginView,
     },
     {
-      path: '/book/:id', // Dynamic route for book detail
+      path: '/book/:id',
       name: 'book-detail',
       component: BookDetail, // This is where the book detail component will be loaded
       props: true, // Pass the ISBN as a prop to the component

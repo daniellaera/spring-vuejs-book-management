@@ -58,7 +58,7 @@ const submitBorrowRequest = async () => {
       life: 3000,
     });
 
-    // Notify parent component of the borrow range update
+    // Notify a parent component of the borrow range update
     emit("borrow-range-updated", [startDate, endDate]);
     selectedDates.value = null; // Optionally reset dates
 

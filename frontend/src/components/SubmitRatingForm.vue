@@ -1,7 +1,6 @@
 <template>
   <div v-if="canRate" class="rating-form">
     <div class="form-group">
-      <!-- Pass the stars prop as a number -->
       <Rating v-model="rating" :stars="5" />
       <Message v-if="errorMessage" severity="error" size="small" variant="simple">
         {{ errorMessage }}

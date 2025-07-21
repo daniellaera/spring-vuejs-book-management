@@ -34,7 +34,7 @@ public class CommentController {
     public ResponseEntity<CommentDTO> createComment(
             @PathVariable Integer bookId,
             @RequestBody CommentDTO commentDTO,
-            @AuthenticationPrincipal User currentUser // Get the logged-in user
+            @AuthenticationPrincipal User currentUser // logged-in user
     )  {
         if (currentUser.getEmail() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);

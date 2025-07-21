@@ -16,6 +16,6 @@ export interface BookDTO {
   ratings?: RatingDTO[];
   averageRating?: number;
   createdDate: Date;
-  publishedDate: Date | null; // Allow null only
+  publishedDate: Date | null;
   borrow?: BorrowDTO;
 }

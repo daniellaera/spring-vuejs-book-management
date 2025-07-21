@@ -52,7 +52,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(Role.USER)
                 .build();
 
-        // Save the new user
         userRepository.save(user);
 
         // Generate JWT token for the user

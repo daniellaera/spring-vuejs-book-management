@@ -86,7 +86,7 @@ public class RatingServiceImpl implements RatingService {
         List<Rating> ratings = book.getRatings();
         double averageRating = calculateAverageRating(ratings);
         book.setAverageRating(averageRating);
-        bookRepository.save(book); // Save the updated book
+        bookRepository.save(book);
     }
 
     private Double calculateAverageRating(List<Rating> ratings) {
