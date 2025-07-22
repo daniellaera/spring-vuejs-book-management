@@ -86,7 +86,6 @@ function startSessionTimer() {
   }, 1000);
 }
 
-// Function to update user details
 export async function updateUserDetails(apiClient: any) {
   const token = localStorage.getItem('auth_token');
   if (!token) return;
