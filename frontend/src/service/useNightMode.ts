@@ -1,4 +1,3 @@
-// src/service/nightMode.ts
 import { ref } from 'vue';
 
 export function useNightMode() {
@@ -10,7 +9,6 @@ export function useNightMode() {
     isNightMode.value = storedMode === 'true';
   }
 
-  // Toggle the night mode
   function toggleNightMode() {
     isNightMode.value = !isNightMode.value;
     localStorage.setItem('nightMode', isNightMode.value.toString());
