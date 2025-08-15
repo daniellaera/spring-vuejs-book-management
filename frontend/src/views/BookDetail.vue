@@ -8,7 +8,7 @@ import CommentForm from '@/components/CommentForm.vue'; // Import the CommentFor
 import Card from 'primevue/card'; // Import PrimeVue Card
 import Button from 'primevue/button';
 import SubmitRatingForm from "@/components/SubmitRatingForm.vue";
-import { sessionState } from "@/service/useSession"; // Import PrimeVue Button
+import {isLoggedIn, sessionState} from "@/service/useSession"; // Import PrimeVue Button
 import DatePicker from 'primevue/datepicker';
 import BorrowBookComponent from "@/components/BorrowBookComponent.vue";
 import ConfirmDialog from 'primevue/confirmdialog';
@@ -230,7 +230,7 @@ const formatDate = (date: Date | null) => {
         @click="goBack"
       />
       <!-- Conditionally render delete button for owner -->
-      <div v-if="isOwner" class="owner-actions">
+      <div v-if="isOwner && isLoggedIn" class="owner-actions">
         <Button
           label="Delete Book"
           class="p-button-danger p-button-rounded"
