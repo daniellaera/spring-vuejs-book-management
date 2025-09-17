@@ -26,11 +26,14 @@ public class RatingServiceImpl implements RatingService {
     private final BookRepository bookRepository;
 
     @Autowired
-    public RatingServiceImpl(RatingRepository ratingRepository, UserRepository userRepository, BookRepository bookRepository) {
-        this.ratingRepository = ratingRepository;
-        this.userRepository = userRepository;
-        this.bookRepository = bookRepository;
-    }
+    public RatingServiceImpl(
+        RatingRepository ratingRepository,
+        UserRepository userRepository,
+        BookRepository bookRepository) {
+            this.ratingRepository = ratingRepository;
+            this.userRepository = userRepository;
+            this.bookRepository = bookRepository;
+        }
 
     @Override
     public RatingDTO createRatingByBookIdAndUserId(Integer bookId, String userEmail, RatingDTO ratingDTO) {

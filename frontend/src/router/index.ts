@@ -54,9 +54,9 @@ const router = createRouter({
       component: EditUserDetails,
       beforeEnter: (to, from, next) => {
         if (isLoggedIn.value) {
-          next(); // Allow access
+          next();
         } else {
-          next('/login'); // Redirect to login page
+          next('/login');
         }
       },
     },
