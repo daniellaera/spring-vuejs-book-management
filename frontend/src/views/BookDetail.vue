@@ -2,13 +2,13 @@
 import {ref, onMounted, computed} from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import apiClient from '@/plugins/axiosConfig';
-import type { BookDTO } from "@/model/book"; // Import BookDTO and BorrowDTO
-import CommentList from '@/views/CommentList.vue'; // Import the CommentList component
-import CommentForm from '@/components/CommentForm.vue'; // Import the CommentForm component
-import Card from 'primevue/card'; // Import PrimeVue Card
+import type { BookDTO } from "@/model/book";
+import CommentList from '@/views/CommentList.vue';
+import CommentForm from '@/components/CommentForm.vue';
+import Card from 'primevue/card';
 import Button from 'primevue/button';
 import SubmitRatingForm from "@/components/SubmitRatingForm.vue";
-import { sessionState } from "@/service/useSession"; // Import PrimeVue Button
+import {isLoggedIn, sessionState} from "@/service/useSession";
 import DatePicker from 'primevue/datepicker';
 import BorrowBookComponent from "@/components/BorrowBookComponent.vue";
 import ConfirmDialog from 'primevue/confirmdialog';
@@ -230,12 +230,13 @@ const formatDate = (date: Date | null) => {
         @click="goBack"
       />
       <!-- Conditionally render delete button for owner -->
-      <div v-if="isOwner" class="owner-actions">
+      <div class="owner-actions">
         <Button
           label="Delete Book"
           class="p-button-danger p-button-rounded"
           icon="pi pi-trash"
           iconPos="left"
+          :disabled="!isLoggedIn || !isOwner"
           @click="confirmDelete(book?.id)"
         />
       </div>
@@ -316,9 +317,14 @@ const formatDate = (date: Date | null) => {
   transition: transform 0.2s;
 }
 
-.p-button-danger:hover {
+.p-button-danger:hover:not(:disabled) {
   transform: scale(1.05);
   box-shadow: 0 4px 10px rgba(255, 75, 43, 0.5);
+}
+
+.p-button-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 </style>
