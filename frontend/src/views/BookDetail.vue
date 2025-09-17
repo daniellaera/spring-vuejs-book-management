@@ -24,8 +24,8 @@ const book = ref<BookDTO | null>(null);
 const route = useRoute();
 const router = useRouter();
 const dates = ref<Date[] | [null, null] | null>(null); // Initialize dates
-const minDate = ref<Date | undefined>(undefined);  // Define minDate as ref
-const maxDate = ref<Date | undefined>(undefined);  // Define maxDate as ref
+const minDate = ref<Date | undefined>(undefined);
+const maxDate = ref<Date | undefined>(undefined);
 
 const confirmDelete = (bookId?: number) => {
   confirm.require({

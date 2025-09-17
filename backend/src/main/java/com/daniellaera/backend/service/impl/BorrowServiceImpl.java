@@ -23,7 +23,11 @@ public class BorrowServiceImpl implements BorrowService {
     private final BorrowRepository borrowRepository;
 
     @Autowired
-    public BorrowServiceImpl(UserRepository userRepository, BookRepository bookRepository, BorrowRepository borrowRepository) {
+    public BorrowServiceImpl(
+            UserRepository userRepository,
+            BookRepository bookRepository,
+            BorrowRepository borrowRepository
+    ) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.borrowRepository = borrowRepository;
