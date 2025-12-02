@@ -9,7 +9,6 @@ import com.daniellaera.backend.service.JwtService;
 import com.daniellaera.backend.utils.TestcontainersConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -19,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class BookControllerITTest {
 
-    @Mock
+    @MockitoBean
     private AuthenticationManager authenticationManager;
 
     @Autowired
@@ -166,7 +166,7 @@ public class BookControllerITTest {
                 .andExpect(jsonPath("$.isbn").value("978-0000000000"))
                 .andExpect(jsonPath("$.author").value("New Author"))
                 .andExpect(jsonPath("$.genre").value("Science Fiction"))
-                .andExpect(jsonPath("$.publishedDate").value("2023-01-01T00:00:00.000+00:00")); // Ensure the date matches
+                .andExpect(jsonPath("$.publishedDate").value("2023-01-01T00:00:00.000Z"));
 
         assertThat(bookRepository.findAll()).hasSize(3); // Two books from setup + one new book
         Book savedBook = bookRepository.findAll().stream()
