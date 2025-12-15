@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 
-// todo not used??
+// todo not used ??
 export function useNightMode() {
   const isNightMode = ref(false);
 
@@ -17,6 +17,6 @@ export function useNightMode() {
 
   return {
     isNightMode,
-    toggleNightMode // todo not used??
+    toggleNightMode // todo not used ??
   };
 }
