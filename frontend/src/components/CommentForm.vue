@@ -19,7 +19,7 @@ const commentContent = ref('');
 const isSubmitting = ref(false);
 const errorMessage = ref<string | null>(null);
 
-// Function to handle comment submission
+// handle comment submission
 const submitComment = async () => {
   if (!commentContent.value.trim()) {
     errorMessage.value = 'Comment cannot be empty.';

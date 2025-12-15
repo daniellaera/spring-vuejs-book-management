@@ -1,4 +1,4 @@
-FROM maven:3.9.9-eclipse-temurin-21-alpine as maven-builder
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS maven-builder
 
 COPY .m2/settings.xml /root/.m2/settings.xml
 
@@ -11,7 +11,7 @@ COPY src /app/src
 
 RUN mvn -f /app/pom.xml clean package -DskipTests
 
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk-slim
 
 COPY --from=maven-builder app/target/backend-0.0.1-SNAPSHOT.jar /app-service/backend-0.0.1-SNAPSHOT.jar
 
