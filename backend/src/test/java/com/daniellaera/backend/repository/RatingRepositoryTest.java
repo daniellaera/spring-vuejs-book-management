@@ -77,7 +77,7 @@ public class RatingRepositoryTest {
 
     @Test
     void shouldFindAllRatingsByBookId() {
-        // Fetch ratings by book ID
+        // Fetch ratings by bookID
         List<Rating> ratings = ratingRepository.findAllByBookId(testBook.getId());
 
         // Assert the fetched ratings

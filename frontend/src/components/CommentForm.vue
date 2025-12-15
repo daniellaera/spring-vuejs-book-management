@@ -41,7 +41,7 @@ const submitComment = async () => {
   errorMessage.value = null;
 
   try {
-    // Making the API request with the user’s token included in the Authorization header
+    // Making the API request with the user’s token included in the Authorization Header
     const token = localStorage.getItem('auth_token');
     const response = await apiClient.post(`/comment/${props.bookId}`, {
       content: commentContent.value,

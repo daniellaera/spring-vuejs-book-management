@@ -160,8 +160,6 @@ jobs:
           context: ./backend
           platforms: linux/amd64
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           tags: |
             docker.nexus.daniellaera.com/book-backend:latest
             docker.nexus.daniellaera.com/book-backend:${{ github.sha }}
@@ -171,8 +169,6 @@ jobs:
         with:
           context: ./frontend
           platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           push: true
           tags: |
             docker.nexus.daniellaera.com/book-frontend:latest
