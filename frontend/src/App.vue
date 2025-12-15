@@ -7,8 +7,6 @@
 <script setup lang="ts">
 import NavBar from '@/views/NavBar.vue';
 
-// Accessing night mode state and toggle function from the composable
-
 // Watch for changes in the night mode state and toggle the body class
 import {onMounted} from 'vue';
 import {checkSession} from "@/service/useSession";

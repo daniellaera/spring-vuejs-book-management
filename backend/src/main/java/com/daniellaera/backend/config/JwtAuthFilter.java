@@ -44,6 +44,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
+        // todo check deprecation (startsWith(...))
         if (StringUtils.isEmpty(authHeader) || !StringUtils.startsWith(authHeader, "Bearer ")) {
             filterChain.doFilter(request, response);
             return;
