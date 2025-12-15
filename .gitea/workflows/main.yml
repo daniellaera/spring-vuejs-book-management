@@ -33,6 +33,7 @@ jobs:
   build-and-test-backend:
     name: Build and Test Application (Backend)
     runs-on: ubuntu-latest
+    container: catthehacker/ubuntu:act-latest
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.backend == 'true' }}
     steps:
@@ -107,6 +108,7 @@ jobs:
   build-and-test-frontend:
     name: Build and Test Application (Frontend)
     runs-on: ubuntu-latest
+    container: catthehacker/ubuntu:act-latest
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.frontend == 'true' }}
     steps:
@@ -131,6 +133,7 @@ jobs:
   dockerize-and-deploy:
     name: Build Images & Deploy to Gitea
     runs-on: ubuntu-latest
+    container: catthehacker/ubuntu:act-latest
     needs: [ build-and-test-backend, build-and-test-frontend ]
     steps:
       - uses: actions/checkout@v4
