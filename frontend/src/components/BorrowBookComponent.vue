@@ -17,7 +17,7 @@ const selectedDates = ref<[Date | null, Date | null] | null>(null); // Selected 
 const toast = useToast();
 const emit = defineEmits(["borrow-range-updated"]);
 
-// Emit for parent updates (if needed)
+// emit for parent updates (if needed)
 watch(selectedDates, (newDates) => {
   emit("borrow-range-updated", newDates);
 });

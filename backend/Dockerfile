@@ -11,7 +11,7 @@ COPY src /app/src
 
 RUN mvn -f /app/pom.xml clean package -DskipTests
 
-FROM eclipse-temurin:21-jdk-slim
+FROM eclipse-temurin:21-jre-jammy
 
 COPY --from=maven-builder app/target/backend-0.0.1-SNAPSHOT.jar /app-service/backend-0.0.1-SNAPSHOT.jar
 
