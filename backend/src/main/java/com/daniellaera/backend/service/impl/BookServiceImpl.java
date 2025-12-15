@@ -102,11 +102,11 @@ public class BookServiceImpl implements BookService {
 
             if (activeBorrow != null) {
                 log.debug("Updating book with ID: {} and borrow with ID: {}", book.getId(), activeBorrow.getId());
-                // Mark borrow as returned and book as available
+                // mark borrow as returned and book as available
                 activeBorrow.setIsReturned(true);
                 book.setIsAvailable(true);
 
-                // Save changes to both borrow and book
+                // save changes to both borrow and book
                 borrowRepository.save(activeBorrow);
                 bookRepository.save(book);
             }

@@ -7,7 +7,7 @@ interface SessionState {
     fullName: string | null,
     githubId: string | null,
     userId: number | null
-  }; // Store user details
+  }; // store user details
 }
 
 // Initialize sessionState as a reactive object

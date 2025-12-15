@@ -88,26 +88,19 @@ jobs:
       #     generate-coverage-endpoint: true
       #     coverage-endpoint-filename: jacoco.json
 
-      - name: Commit and push badges to badges branch (Backend)
-        if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-          # Create or switch to the badges branch
-          git checkout -B badges  
-          
-          # Ensure badges directory exists
-          mkdir -p badges
-          
-          # Copy generated badge files
-          cp .github/badges/jacoco.svg badges/
-          cp .github/badges/jacoco.json badges/
-
-          # Stage and commit changes
-          git add badges/*
-          git commit -m "Update JaCoCo coverage badges" || echo "No changes to commit"
-          git push origin badges --force  # Push to badges branch
+      # ❌ Disabled on Gitea:
+      # - name: Commit and push badges to badges branch (Backend)
+      #   if: ${{ github.event_name != 'pull_request' }}
+      #   run: |
+      #     git config --global user.name 'github-actions'
+      #     git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      #     git checkout -B badges
+      #     mkdir -p badges
+      #     cp .github/badges/jacoco.svg badges/
+      #     cp .github/badges/jacoco.json badges/
+      #     git add badges/*
+      #     git commit -m "Update JaCoCo coverage badges" || echo "No changes to commit"
+      #     git push origin badges --force
 
   build-and-test-frontend:
     name: Build and Test Application (Frontend)
