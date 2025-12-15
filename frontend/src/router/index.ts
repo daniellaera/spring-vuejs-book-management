@@ -44,7 +44,7 @@ const router = createRouter({
         if (isLoggedIn.value) {
           next(); // Allow access
         } else {
-          next("/login"); // Redirect to login page
+          next("/login");
         }
       },
     },

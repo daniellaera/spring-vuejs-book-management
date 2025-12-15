@@ -34,7 +34,7 @@ jobs:
     name: Build and Test Application (Backend)
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: ${{ needs.deploy.outputs.backend == 'true' }}
+    if: ${{ needs.detect-changes.outputs.backend == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -108,7 +108,7 @@ jobs:
     name: Build and Test Application (Frontend)
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: ${{ needs.deploy.outputs.frontend == 'true' }}
+    if: ${{ needs.detect-changes.outputs.frontend == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

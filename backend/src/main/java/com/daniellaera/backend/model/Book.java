@@ -31,6 +31,7 @@ public class Book {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
 
+    // todo check Temporal deprecation
     @Temporal(TemporalType.DATE) // Represents the book's real-world publication date
     private Date publishedDate;
 
