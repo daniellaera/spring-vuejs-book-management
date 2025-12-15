@@ -27,7 +27,7 @@ import { Rating, Button, Message } from "primevue";
 import type { RatingDTO } from "@/model/rating";
 import Toast from "primevue/toast";
 
-// Props for BookDTO data
+// Props for Book DTO data
 const props = defineProps({
   sessionUserId: {
     type: Number,

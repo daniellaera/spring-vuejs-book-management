@@ -80,7 +80,7 @@ public class BookControllerITTest {
         Book book2 = new Book();
         book2.setTitle("Title 2");
         book2.setDescription("Description 2");
-        book2.setIsbn("978-0262033848");
+        book2.setIsbn("978-0262073848");
         book2.setAuthor("Joshua Bloch");
         book2.setGenre("Programming");
         book2.setPublishedDate(Date.from(publishedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
