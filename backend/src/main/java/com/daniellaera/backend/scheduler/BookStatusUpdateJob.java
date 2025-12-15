@@ -26,7 +26,7 @@ public class BookStatusUpdateJob implements Job {
             bookService.updateExpiredBookStatus();
         } catch (Exception e) {
             log.error("Error occurred while updating book statuses: {}", e.getMessage(), e);
-            throw new JobExecutionException("Failed to update book statuses", e);
+            throw new JobExecutionException("Failed to update book statuses", e); // one or more status(es) ?
         }
     }
 }

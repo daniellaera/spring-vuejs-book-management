@@ -40,6 +40,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install Maven
+        run: |
+          apt-get update
+          apt-get install -y maven
+
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
