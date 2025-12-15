@@ -13,6 +13,7 @@ jobs:
   detect-changes:
     name: Determine Changes
     runs-on: ubuntu-latest
+    container: catthehacker/ubuntu:act-latest
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
