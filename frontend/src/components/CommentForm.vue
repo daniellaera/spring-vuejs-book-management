@@ -31,7 +31,7 @@ const submitComment = async () => {
     return;
   }
 
-  // Ensure user is logged in before allowing them to post
+  // ensure user is logged in before allowing them to post
   if (!isLoggedIn.value) {
     errorMessage.value = 'You must be logged in to post a comment.';
     return;
