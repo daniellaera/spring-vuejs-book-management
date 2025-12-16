@@ -17,7 +17,7 @@ export const sessionState = reactive<SessionState>({
   userDetails: { fullName: null, githubId: null, userId: null },
 });
 
-// Computed property to check if the user is logged in
+// Computed property to check if the User is logged in
 export const isLoggedIn = computed(() => {
   return sessionState.tokenExpiration !== null && sessionState.tokenExpiration > Date.now();
 });
