@@ -10,7 +10,7 @@ interface SessionState {
   }; // store user details
 }
 
-// Initialize sessionState as a reactive object
+// initialize sessionState as a reactive object
 export const sessionState = reactive<SessionState>({
   tokenExpiration: null,
   timeLeft: 0,

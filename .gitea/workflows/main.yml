@@ -13,7 +13,7 @@ jobs:
   detect-changes:
     name: Determine Changes
     runs-on: ubuntu-latest
-    container: 192.168.1.103:3000/daniellaera/infra-ci-images/ci-java21-node24:24.04-1
+    container: 192.168.1.103:3000/daniellaera/ci-java21-node24:24.04-1
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
@@ -33,7 +33,7 @@ jobs:
   build-and-test-backend:
     name: Build and Test Application (Backend)
     runs-on: ubuntu-latest
-    container: 192.168.1.103:3000/daniellaera/infra-ci-images/ci-java21-node24:24.04-1
+    container: 192.168.1.103:3000/daniellaera/ci-java21-node24:24.04-1
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.backend == 'true' }}
     steps:
@@ -93,7 +93,7 @@ jobs:
   build-and-test-frontend:
     name: Build and Test Application (Frontend)
     runs-on: ubuntu-latest
-    container: 192.168.1.103:3000/daniellaera/infra-ci-images/ci-java21-node24:24.04-1
+    container: 192.168.1.103:3000/daniellaera/ci-java21-node24:24.04-1
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.frontend == 'true' }}
     steps:
@@ -111,7 +111,7 @@ jobs:
   dockerize-and-deploy:
     name: Build Images & Deploy to Gitea
     runs-on: ubuntu-latest
-    container: 192.168.1.103:3000/daniellaera/infra-ci-images/ci-java21-node24:24.04-1
+    container: 192.168.1.103:3000/daniellaera/ci-java21-node24:24.04-1
     needs: [ build-and-test-backend, build-and-test-frontend ]
     steps:
       - uses: actions/checkout@v4
