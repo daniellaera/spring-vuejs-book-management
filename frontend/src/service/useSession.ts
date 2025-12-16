@@ -22,7 +22,7 @@ export const isLoggedIn = computed(() => {
   return sessionState.tokenExpiration !== null && sessionState.tokenExpiration > Date.now();
 });
 
-// Function to set the token expiration and update the countdown
+// Function to set the Token expiration and update the countdown
 export function setTokenExpiration(token: string) {
   const expiration = getTokenExpiration(token);
   if (expiration) {
