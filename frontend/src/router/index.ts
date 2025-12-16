@@ -33,7 +33,7 @@ const router = createRouter({
     {
       path: '/book/:id',
       name: 'book-detail',
-      component: BookDetail, // This is where the book detail component will be loaded
+      component: BookDetail, // This is where book detail component will be loaded
       props: true, // Pass the ISBN as a prop to the component
     },
     {

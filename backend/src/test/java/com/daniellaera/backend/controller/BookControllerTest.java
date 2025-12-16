@@ -45,7 +45,7 @@ public class BookControllerTest {
 
     @Test
     void getAllBooks() throws Exception {
-        // Sample books
+        // create a book mock
         BookDTO bookDTO1 = new BookDTO();
         bookDTO1.setIsbn("123456789");
         bookDTO1.setTitle("Title");
