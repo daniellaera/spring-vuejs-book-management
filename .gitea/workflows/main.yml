@@ -43,14 +43,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build and Test Backend
-        working-directory: ./backend
-        run: mvn clean verify
-
       - name: Configure Maven Settings
         run: |
           mkdir -p ~/.m2
           echo "${{ secrets.MAVEN_SETTINGS_XML }}" | base64 --decode > ~/.m2/settings.xml
+
+      - name: Build and Test Backend
+        working-directory: ./backend
+        run: mvn clean verify
 
       - name: Set release version
         working-directory: ./backend
@@ -132,25 +132,31 @@ jobs:
           username: ${{ secrets.NEXUS_USER }}
           password: ${{ secrets.NEXUS_PASSWORD }}
 
-      - name: Build and Push Backend Image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./backend
-          platforms: linux/amd64
-          push: true
-          tags: |
-            docker.nexus.daniellaera.com/book-backend:latest
-            docker.nexus.daniellaera.com/book-backend:${{ github.sha }}
+      - name: Build Backend Image
+        run: |
+          docker build \
+            --platform linux/amd64 \
+            -t docker.nexus.daniellaera.com/book-backend:latest \
+            -t docker.nexus.daniellaera.com/book-backend:${{ github.sha }} \
+            ./backend
 
-      - name: Build and Push Frontend Image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./frontend
-          platforms: linux/amd64
-          push: true
-          tags: |
-            docker.nexus.daniellaera.com/book-frontend:latest
-            docker.nexus.daniellaera.com/book-frontend:${{ github.sha }}
+      - name: Push Backend Image
+        run: |
+          docker push docker.nexus.daniellaera.com/book-backend:latest
+          docker push docker.nexus.daniellaera.com/book-backend:${{ github.sha }}
+
+      - name: Build Frontend Image
+        run: |
+          docker build \
+            --platform linux/amd64 \
+            -t docker.nexus.daniellaera.com/book-frontend:latest \
+            -t docker.nexus.daniellaera.com/book-frontend:${{ github.sha }} \
+            ./frontend
+
+      - name: Push Frontend Image
+        run: |
+          docker push docker.nexus.daniellaera.com/book-frontend:latest
+          docker push docker.nexus.daniellaera.com/book-frontend:${{ github.sha }}
 
       - name: Deploy to app-book-dev via SSH
         uses: appleboy/ssh-action@v1.2.0

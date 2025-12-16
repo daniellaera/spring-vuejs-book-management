@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import router from '@/router'; // This should match the alias set in vite.config.ts
+import router from '@/router'; // this should match the alias set in vite.config.ts
 import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import 'primeicons/primeicons.css'

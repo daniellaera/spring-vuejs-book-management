@@ -21,7 +21,7 @@ public class BookStatusUpdateJobTest {
     @InjectMocks
     private BookStatusUpdateJob bookStatusUpdateJob;
 
-    @Mock
+    @Mock // the right one?
     private JobExecutionContext jobExecutionContext;
 
     @Test
