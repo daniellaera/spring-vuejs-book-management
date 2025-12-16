@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class BookStatusUpdateJobTest {
 
-    // TODO new mock or inject mock??
+    // TODO new @Mock or inject mock??
     @Mock
     private BookService bookService;
 

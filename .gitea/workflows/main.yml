@@ -18,6 +18,9 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
+      - name: Login to Gitea Registry
+        run: echo "onlyforme" | docker login 192.168.1.103:3000 -u "daniellaera" --password-stdin
+
       - uses: actions/checkout@v4
       # Using dorny/paths-filter (compatible with Gitea Actions)
       - uses: dorny/paths-filter@v2
