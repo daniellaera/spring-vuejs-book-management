@@ -75,7 +75,7 @@
 
       <!-- Image Column -->
       <Column header="Image">
-        <template #body="slotProps">
+        <template>
           <img
             :src="getRandomImage()"
             :alt="`Random Book Cover`"

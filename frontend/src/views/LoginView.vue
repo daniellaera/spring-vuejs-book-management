@@ -93,6 +93,7 @@ import Message from 'primevue/message';
 import { useRouter } from 'vue-router';
 import apiClient from '@/plugins/axiosConfig';
 import { setTokenExpiration } from '@/service/useSession';
+import type {AxiosError} from "axios";
 
 export default defineComponent({
   name: 'LoginView',
@@ -128,7 +129,6 @@ export default defineComponent({
       errors.value.password = !loginData.value.password ? 'Password is required.' : '';
     };
 
-    // Form submission handler
     const handleLogin = async () => {
       validateForm();
 
@@ -144,11 +144,16 @@ export default defineComponent({
 
           await router.push('/');
           errorMessage.value = null; // Clear error message if login is successful
-        } catch (error: any) {
-          console.error('Login Failed', error);
-          // If backend returns an error message, display it
-          errorMessage.value = error.response?.data?.message || 'Invalid username or password';
-          localStorage.removeItem('auth_token'); // Clear local storage on failed login attempt
+        } catch (error: unknown) {
+          // Use type assertion for AxiosError
+          const axiosError = error as AxiosError<{ message?: string }>;
+          console.error('Login Failed', axiosError);
+
+          errorMessage.value =
+            axiosError.response?.data?.message || 'Invalid username or password';
+
+          // Clear local storage on failed login attempt
+          localStorage.removeItem('auth_token');
           localStorage.removeItem('username');
         }
       }

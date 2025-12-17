@@ -1,4 +1,5 @@
 import { reactive, computed } from 'vue';
+import type { AxiosError, AxiosInstance } from "axios";
 
 interface SessionState {
   tokenExpiration: number | null;
@@ -86,19 +87,21 @@ function startSessionTimer() {
   }, 1000);
 }
 
-export async function updateUserDetails(apiClient: any) {
+export async function updateUserDetails(apiClient: AxiosInstance) {
   const token = localStorage.getItem('auth_token');
   if (!token) return;
 
   try {
     const response = await apiClient.get('/auth/me', {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
     });
-    sessionState.userDetails.fullName = response.data.fullName; // Update the user details
-    sessionState.userDetails.githubId = response.data.githubId || null; // Default to null if githubId is missing
-    sessionState.userDetails.userId = response.data.userId || null; // Default to null if githubId is missing
-  } catch (error) {
-    console.error('Failed to fetch user details:', error);
+
+    sessionState.userDetails.fullName = response.data.fullName;
+    sessionState.userDetails.githubId = response.data.githubId || null;
+    sessionState.userDetails.userId = response.data.userId || null;
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    console.error('Failed to fetch user details:', axiosError);
     resetSession(); // Reset session on error
   }
 }

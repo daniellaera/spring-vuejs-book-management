@@ -8,6 +8,7 @@ import {isLoggedIn, updateUserDetails} from "@/service/useSession";
 import type { SignUpRequest } from "@/model/signup-request";
 import Toast from "primevue/toast";
 import {useRouter} from "vue-router";
+import type {AxiosError} from "axios";
 
 // Toast instance
 const toast = useToast();
@@ -86,10 +87,14 @@ const submitForm = async () => {
     });
 
     resetForm();
-  } catch (error: any) {
-    console.error('Form submission failed:', error);
+  } catch (error: unknown) {
+    // Use type guard to safely handle AxiosError
+    const axiosError = error as AxiosError<{ message?: string }>;
+    console.error('Form submission failed:', axiosError);
+
     errorMessage.value =
-      error.response?.data?.message || 'An unexpected error occurred.';
+      axiosError.response?.data?.message || 'An unexpected error occurred.';
+
     toast.add({
       severity: "error",
       summary: "Error",
@@ -99,6 +104,7 @@ const submitForm = async () => {
   } finally {
     isSubmitting.value = false;
   }
+
 };
 
 // Reset the form fields

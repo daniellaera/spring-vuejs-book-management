@@ -149,8 +149,8 @@ const submitForm = async () => {
 
     const token = localStorage.getItem('auth_token');
 
-    const response = await apiClient.post("/book", formattedBook, {
-      headers: { Authorization: `Bearer ${token}` }, // Pass the token in the header
+    await apiClient.post("/book", formattedBook, {
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     toast.add({

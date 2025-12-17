@@ -26,6 +26,7 @@ import { useToast } from "primevue/usetoast";
 import { Rating, Button, Message } from "primevue";
 import type { RatingDTO } from "@/model/rating";
 import Toast from "primevue/toast";
+import type { AxiosError } from "axios";
 
 // props for Book DTO data
 const props = defineProps({
@@ -86,12 +87,13 @@ const submitRating = async () => {
     rating.value = undefined;
 
     toast.add({ severity: "success", summary: "Rating submitted!", life: 3000 });
-  } catch (error: any) {
-    console.error("Error submitting rating:", error);
-    errorMessage.value =
-      error.response?.status === 401
-        ? "Unauthorized. Please log in again."
-        : "Failed to submit the rating. Please try again.";
+  } catch (error: unknown) {
+  const axiosError = error as AxiosError;
+  console.error("Error submitting rating:", axiosError);
+  errorMessage.value =
+    axiosError.response?.status === 401
+      ? "Unauthorized. Please log in again."
+      : "Failed to submit the rating. Please try again.";
   } finally {
     isSubmitting.value = false;
   }

@@ -66,6 +66,7 @@ import { useRouter } from 'vue-router';
 import { InputText, Password, Message } from 'primevue';
 import PrimeButton from 'primevue/button';
 import apiClient from '@/plugins/axiosConfig';
+import type {AxiosError} from "axios";
 
 export default defineComponent({
   name: 'SignUpForm',
@@ -100,7 +101,7 @@ export default defineComponent({
       errors.value.password = !signUpData.value.password ? 'Password is required.' : '';
     };
 
-    // Form submission handler
+
     const handleSignUp = async () => {
       validateForm();
 
@@ -111,13 +112,13 @@ export default defineComponent({
 
           // Redirect to login after successful sign-up
           await router.push('/login');
-        } catch (error: any) {
-          if (error.response) {
-            errorMessage.value = error.response.data || 'An error occurred. Please try again.';
-          } else {
-            errorMessage.value = 'An unknown error occurred. Please try again.';
-          }
-          console.error('Sign Up Failed', error);
+        } catch (error: unknown) {
+          const axiosError = error as AxiosError<{ message?: string }>;
+          console.error('Sign Up Failed', axiosError);
+
+          errorMessage.value =
+            axiosError.response?.data?.message ||
+            'An unknown error occurred. Please try again.';
         }
       }
     };

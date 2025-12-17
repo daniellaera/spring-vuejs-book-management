@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { isLoggedIn } from "@/service/useSession"; // Import the session management
 import apiClient from '@/plugins/axiosConfig';
+import type { AxiosError } from 'axios';
 
 // Props for the bookId
 const props = defineProps({
@@ -43,27 +44,35 @@ const submitComment = async () => {
   try {
     // Making the API request with the user’s token included in the Authorization Header
     const token = localStorage.getItem('auth_token');
-    const response = await apiClient.post(`/comment/${props.bookId}`, {
-      content: commentContent.value,
-    }, {
-      headers: { Authorization: `Bearer ${token}` }, // Pass the token in the header
-    });
+
+    const response = await apiClient.post(
+      `/comment/${props.bookId}`,
+      {
+        content: commentContent.value,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
     // Emit the new comment to the parent component
     emit('comment-added', response.data);
 
     // Clear the input field after submission
     commentContent.value = '';
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error submitting comment:', error);
-    if (error.response && error.response.status === 401) {
+
+    if ((error as AxiosError).response?.status === 401) {
       errorMessage.value = 'Unauthorized. Please log in again.';
     } else {
-      errorMessage.value = 'Failed to submit the comment. Please try again later.';
+      errorMessage.value =
+        'Failed to submit the comment. Please try again later.';
     }
   } finally {
     isSubmitting.value = false;
   }
+
 };
 </script>
 
