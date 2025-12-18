@@ -34,3 +34,7 @@ social:
 quartz:
   scheduler:
     cron: "0 0 0 * * ?"  # Every day at midnight
+
+app:
+  version: @project.version@
+  build-time: @maven.build.timestamp@

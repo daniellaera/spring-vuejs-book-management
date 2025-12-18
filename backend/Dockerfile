@@ -8,14 +8,16 @@ RUN mvn -f /app/pom.xml dependency:go-offline # Download dependencies before cop
 
 COPY src /app/src
 
-RUN mvn -f /app/pom.xml clean package -DskipTests
+# Accept version as build arg
+ARG APP_VERSION=dev
+RUN mvn -f /app/pom.xml clean package -DskipTests -Drevision=${APP_VERSION}
 
 FROM eclipse-temurin:21-jre-jammy
 
-COPY --from=maven-builder app/target/backend-0.0.1-SNAPSHOT.jar /app-service/backend-0.0.1-SNAPSHOT.jar
+COPY --from=maven-builder app/target/backend-*.jar /app-service/backend.jar
 
 WORKDIR /app-service
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "backend-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "backend.jar"]

@@ -19,7 +19,7 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
       - name: Login to Gitea Registry
-        run: echo "onlyforme" | docker login 192.168.1.103:3000 -u "daniellaera" --password-stdin
+        run: echo "${{ secrets.GIT_PASSWORD }}" | docker login 192.168.1.103:3000 -u "${{ secrets.GIT_USERNAME }}" --password-stdin
 
       - uses: actions/checkout@v4
       # Using dorny/paths-filter (compatible with Gitea Actions)
@@ -47,6 +47,14 @@ jobs:
         run: |
           mkdir -p ~/.m2
           echo "${{ secrets.MAVEN_SETTINGS_XML }}" | base64 --decode > ~/.m2/settings.xml
+
+      # Generate version BEFORE build
+      - name: Set Version
+        run: |
+          VERSION="1.0.${{ github.run_number }}"
+          echo "Building version: ${VERSION}"
+          cd backend
+          mvn versions:set -DnewVersion=${VERSION}
 
       - name: Build and Test Backend
         working-directory: ./backend
@@ -132,11 +140,19 @@ jobs:
           username: ${{ secrets.NEXUS_USER }}
           password: ${{ secrets.NEXUS_PASSWORD }}
 
+      - name: Generate Version
+        id: version
+        run: |
+          VERSION="1.0.${{ github.run_number }}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
       - name: Build Backend Image
         run: |
           docker build \
             --platform linux/amd64 \
+            --build-arg APP_VERSION=${{ steps.version.outputs.version }} \
             -t docker.nexus.daniellaera.com/book-backend:latest \
+            -t docker.nexus.daniellaera.com/book-backend:${{ steps.version.outputs.version }} \
             -t docker.nexus.daniellaera.com/book-backend:${{ github.sha }} \
             ./backend
 

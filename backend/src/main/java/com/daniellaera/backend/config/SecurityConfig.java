@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v3/auth/**").permitAll() // Public endpoints ?
+                        .requestMatchers("/api/version").permitAll()
                         .requestMatchers("/api/v3/auth/me").hasAuthority("USER")
                         .requestMatchers("/api/v3/book/**").permitAll()
                         .requestMatchers("/api/v3/comment/**").permitAll()
