@@ -3,31 +3,51 @@
     <div class="book-list-section">
       <BookList />
     </div>
+    <footer class="home-footer">
+      Version: {{ version }} | Build: {{ buildTime }}
+    </footer>
   </section>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
 import BookList from "@/views/BookList.vue";
+import { getVersion, type VersionInfo } from "@/service/versionService";
+
+const version = ref("loading...");
+const buildTime = ref("");
+
+onMounted(async () => {
+  const versionInfo: VersionInfo = await getVersion();
+  version.value = versionInfo.version;
+  buildTime.value = versionInfo.buildTime;
+});
 </script>
 
 <style scoped>
-/* Home view container styling */
 .home-view {
   display: flex;
-  justify-content: center; /* Centers content horizontally */
-  align-items: flex-start; /* Aligns content to the top of the container */
-  padding-top: 80px; /* Adds space for the fixed navbar */
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 80px;
 }
 
 .book-list-section {
   width: 100%;
-  max-width: 1200px; /* Sets a maximum width for large screens */
-  margin: 0 auto; /* Centers the book list section */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.home-footer {
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #666;
 }
 
 @media (max-width: 1024px) {
   .home-view {
-    padding-top: 60px; /* Adjusts top padding for smaller screens */
+    padding-top: 60px;
   }
 }
 </style>

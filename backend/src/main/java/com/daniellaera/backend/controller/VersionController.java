@@ -1,9 +1,8 @@
 package com.daniellaera.backend.controller;
 
 import com.daniellaera.backend.properties.VersionProperties;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,28 +10,31 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v3")
 @Slf4j
 public class VersionController {
 
     private final VersionProperties versionProperties;
 
-    @Autowired
     public VersionController(VersionProperties versionProperties) {
         this.versionProperties = versionProperties;
-        // Log version info at startup
-        log.info("Application initialized - Version: {}, Build Time: {}",
-                versionProperties.getVersion(),
-                versionProperties.getBuildTime());
     }
 
+    /**
+     * Returns the current application version and build time.
+     *
+     * @return Map with version and buildTime
+     */
     @GetMapping("/version")
-    public Map<String, String> getVersion() {
-        log.debug("Version endpoint called - returning version: {}",
-                versionProperties.getVersion());
-        return Map.of(
-                "version", versionProperties.getVersion(),
-                "buildTime", versionProperties.getBuildTime()
-        );
+    public ResponseEntity<Map<String, String>> getVersion() {
+        String version = versionProperties.getVersion();
+        String buildTime = versionProperties.getBuildTime();
+
+        log.info("Version endpoint called - returning version: {}, buildTime: {}", version, buildTime);
+
+        return ResponseEntity.ok(Map.of(
+                "version", version,
+                "buildTime", buildTime
+        ));
     }
 }
