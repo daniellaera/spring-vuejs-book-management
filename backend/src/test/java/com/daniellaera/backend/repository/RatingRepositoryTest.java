@@ -37,6 +37,7 @@ public class RatingRepositoryTest {
 
     @BeforeEach
     void setUp() {
+        ratingRepository.deleteAll();
         bookRepository.deleteAll();
         userRepository.deleteAll();
 
@@ -46,22 +47,19 @@ public class RatingRepositoryTest {
         testUser.setRole(Role.USER);
         userRepository.save(testUser);
 
-        // Create a test book
         testBook = new Book();
         testBook.setTitle("Test Book");
-        testBook.setAuthor("Test Author");
-        testBook.setIsbn("978-1234567890");
         testBook.setAuthor("Thomas H. Cormen");
+        testBook.setIsbn("978-" + (System.nanoTime() % 1000000000L));
         testBook.setGenre("Fiction");
         testBook.setCreatedBy(testUser);
 
-        LocalDate publishedLocalDate = LocalDate.of(2020, 5, 15); // May 15, 2020
+        LocalDate publishedLocalDate = LocalDate.of(2020, 5, 15);
         testBook.setPublishedDate(Date.from(publishedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
         testBook.setCreatedDate(new Date());
 
         bookRepository.save(testBook);
 
-        // Add ratings to the test book
         Rating rating1 = new Rating();
         rating1.setScore(4);
         rating1.setUser(testUser);

@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -65,7 +66,7 @@ public class BookControllerTest {
         Page<BookDTO> bookDTOPage = new PageImpl<>(Arrays.asList(bookDTO1, bookDTO2), pageable, 2);
 
         // Mock the service response
-        given(bookService.getAllBooks(any(Pageable.class))).willReturn(bookDTOPage);
+        given(bookService.getAllBooks(any(Pageable.class), any())).willReturn(bookDTOPage);
 
         // Perform the GET request with pagination params
         mockMvc.perform(get("/api/v3/book")
@@ -78,9 +79,32 @@ public class BookControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content.length()").value(2))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements").value(2))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.size").value(5))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.number").value(0))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sort").exists());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pageSize").value(5))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pageNumber").value(0));
+    }
+
+    @Test
+    void getAllBooks_WithSearch() throws Exception {
+        BookDTO bookDTO1 = new BookDTO();
+        bookDTO1.setIsbn("123456789");
+        bookDTO1.setTitle("Title");
+        bookDTO1.setAuthor("Thomas H. Cormen");
+        bookDTO1.setGenre("Fiction");
+
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("title").ascending());
+        Page<BookDTO> bookDTOPage = new PageImpl<>(List.of(bookDTO1), pageable, 1);
+
+        given(bookService.getAllBooks(any(Pageable.class), eq("Title"))).willReturn(bookDTOPage);
+
+        mockMvc.perform(get("/api/v3/book")
+                        .param("page", "0")
+                        .param("size", "5")
+                        .param("sort", "title,asc")
+                        .param("search", "Title")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content.length()").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements").value(1));
     }
 
     @Test

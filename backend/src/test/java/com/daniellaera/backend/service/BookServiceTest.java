@@ -1,9 +1,11 @@
 package com.daniellaera.backend.service;
 
 import com.daniellaera.backend.dao.BookDTO;
+import com.daniellaera.backend.dao.UserDTO;
 import com.daniellaera.backend.model.Book;
 import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.repository.BookRepository;
+import com.daniellaera.backend.repository.BookRepositoryCustom;
 import com.daniellaera.backend.repository.UserRepository;
 import com.daniellaera.backend.service.impl.BookServiceImpl;
 import com.daniellaera.backend.service.impl.BorrowRepository;
@@ -17,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
@@ -42,6 +45,9 @@ public class BookServiceTest {
     private BookRepository bookRepository;
 
     @Mock
+    private BookRepositoryCustom bookRepositoryCustom;
+
+    @Mock
     private BorrowRepository borrowRepository;
 
     @BeforeEach
@@ -52,65 +58,49 @@ public class BookServiceTest {
 
     @Test
     void getAllBooks_ShouldReturnPagedBooks() {
-        // Arrange
-        User user = new User();
-        user.setId(1);
-        user.setEmail("john.doe@example.com");
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setPassword("password");
+        BookDTO bookDTO = new BookDTO();
+        bookDTO.setId(1);
+        bookDTO.setTitle("Test Book");
 
-        Book book = new Book();
-        book.setId(1);
-        book.setTitle("Test Book");
-        book.setCreatedBy(user); // Set createdBy user
+        Page<BookDTO> page = new PageImpl<>(List.of(bookDTO));
+        when(bookRepository.findAllBooksOptimized(any(PageRequest.class), any())).thenReturn(page);
 
-        Page<Book> page = new PageImpl<>(List.of(book));
-        when(bookRepository.findAll(any(PageRequest.class))).thenReturn(page);
-
-        Page<BookDTO> result = bookService.getAllBooks(PageRequest.of(0, 10));
+        Page<BookDTO> result = bookService.getAllBooks(PageRequest.of(0, 10), null);
 
         assertThat(result.getTotalElements()).isEqualTo(1);
         assertThat(result.getContent().getFirst().getTitle()).isEqualTo("Test Book");
-        assertThat(result.getContent().getFirst().getUserDTO().getFullName()).isEqualTo("John Doe");
-        verify(bookRepository, times(1)).findAll(any(PageRequest.class));
+        verify(bookRepository, times(1)).findAllBooksOptimized(any(Pageable.class), any());
     }
 
     @Test
     void findBookById_ShouldReturnBookIfExists() {
-        User user = new User();
-        user.setId(1);
-        user.setEmail("john.doe@example.com");
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setPassword("password");
-        // Arrange
-        Book book = new Book();
-        book.setId(1);
-        book.setTitle("Test Book");
-        book.setCreatedBy(user); // Set createdBy user
-        when(bookRepository.findById(1)).thenReturn(Optional.of(book));
+        BookDTO bookDTO = BookDTO.builder()
+                .id(1)
+                .title("Test Book")
+                .userDTO(UserDTO.builder()
+                        .id(1)
+                        .fullName("John Doe")
+                        .build())
+                .build();
 
-        // Act
+        when(bookRepository.findBookByIdOptimized(1)).thenReturn(Optional.of(bookDTO));
+
         Optional<BookDTO> result = bookService.findBookById(1);
 
-        // Assert
         assertThat(result).isPresent();
         assertThat(result.get().getTitle()).isEqualTo("Test Book");
-        verify(bookRepository, times(1)).findById(1);
+        assertThat(result.get().getUserDTO().getFullName()).isEqualTo("John Doe");
+        verify(bookRepository, times(1)).findBookByIdOptimized(1);
     }
 
     @Test
     void findBookById_ShouldReturnEmptyIfNotFound() {
-        // Arrange
-        when(bookRepository.findById(1)).thenReturn(Optional.empty());
+        when(bookRepository.findBookByIdOptimized(1)).thenReturn(Optional.empty());
 
-        // Act
         Optional<BookDTO> result = bookService.findBookById(1);
 
-        // Assert
         assertThat(result).isEmpty();
-        verify(bookRepository, times(1)).findById(1);
+        verify(bookRepository, times(1)).findBookByIdOptimized(1);
     }
 
     @Test
