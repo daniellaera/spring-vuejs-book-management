@@ -1,6 +1,7 @@
 package com.daniellaera.backend.controller;
 
 import com.daniellaera.backend.dao.BookDTO;
+import com.daniellaera.backend.dao.response.PageResponse;
 import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.service.BookService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +28,12 @@ public class BookController {
     }
 
     @GetMapping
-    public Page<BookDTO> getAllBooks(Pageable pageable) {
-        return bookService.getAllBooks(pageable);
+    public PageResponse<BookDTO> getAllBooks(
+            Pageable pageable,
+            @RequestParam(required = false) String search
+    ) {
+        Page<BookDTO> page = bookService.getAllBooks(pageable, search);
+        return PageResponse.of(page);
     }
 
     @GetMapping("{bookId}")

@@ -11,8 +11,8 @@ import java.util.Date;
 
 @Data
 @Builder
-@NoArgsConstructor // Fixes the deserialization issue
-@AllArgsConstructor // Ensures the @Builder annotation still works correctly
+@NoArgsConstructor
+@AllArgsConstructor
 public class BorrowDTO {
     private Integer bookId;
     private Integer userId;

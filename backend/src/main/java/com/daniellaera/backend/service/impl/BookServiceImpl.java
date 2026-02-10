@@ -37,14 +37,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Page<BookDTO> getAllBooks(Pageable pageable) {
-        return bookRepository.findAll(pageable)
-                .map(this::convertBookEntityToBookDto);
+    public Page<BookDTO> getAllBooks(Pageable pageable, String search) {
+        return bookRepository.findAllBooksOptimized(pageable, search);
     }
 
     @Override
     public Optional<BookDTO> findBookById(Integer bookId) {
-        return bookRepository.findById(bookId).map(this::convertBookEntityToBookDto);
+        return bookRepository.findBookByIdOptimized(bookId);
     }
 
     @Override
@@ -73,6 +72,33 @@ public class BookServiceImpl implements BookService {
         });
         bookRepository.delete(book);
         log.info("Book with id: {} deleted", bookId);
+    }
+
+    @Override
+    public Page<BookAiView> getBookList(Pageable pageable) {
+        return bookRepository.findBookList(pageable)
+                .map(p -> new BookAiView(
+                        p.getId(),
+                        p.getTitle(),
+                        p.getAuthor(),
+                        p.getIsAvailable()
+                ));
+    }
+
+    @Override
+    public List<BookAiView> searchByKeyword(String keyword) {
+        log.info("Searching database for keyword: {}", keyword);
+
+        // Using a derived query method from the repository
+        return bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(keyword, keyword)
+                .stream()
+                .map(p -> new BookAiView(
+                        p.getId(),
+                        p.getTitle(),
+                        p.getAuthor(),
+                        p.getIsAvailable()
+                ))
+                .toList();
     }
 
     @Override

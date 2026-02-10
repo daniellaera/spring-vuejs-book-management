@@ -1,4 +1,4 @@
-name: Deploy Spring and VueJS App
+name: Deploy Spring and Angular App
 
 on:
   push:
@@ -115,9 +115,9 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
-      - name: Run Vitest Tests
+      - name: Run Tests
         working-directory: ./frontend
-        run: npm run test
+        run: npm run test -- --watch=false
 
   dockerize-and-deploy:
     name: Build Images & Deploy to Gitea

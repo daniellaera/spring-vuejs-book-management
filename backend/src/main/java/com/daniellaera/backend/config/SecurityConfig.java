@@ -4,6 +4,7 @@ import com.daniellaera.backend.properties.Oauth2Properties;
 import com.daniellaera.backend.service.impl.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -41,25 +42,51 @@ public class SecurityConfig {
         http
                 .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v3/auth/**").permitAll() // Public endpoints ?
-                        .requestMatchers("/api/v3/version").permitAll()
-                        .requestMatchers("/api/v3/auth/me").hasAuthority("USER")
-                        .requestMatchers("/api/v3/book/**").permitAll()
-                        .requestMatchers("/api/v3/comment/**").permitAll()
-                        .requestMatchers("/api/v3/rating/**").permitAll()
-                        .requestMatchers("/api/v3/borrow/**").permitAll()
-                        .requestMatchers("/api/v3/features/**").permitAll()
-                )
+                .authorizeHttpRequests(auth -> {
+                    // Auth endpoints
+                    auth.requestMatchers("/api/v3/auth/signin", "/api/v3/auth/signup").permitAll();
+                    auth.requestMatchers("/api/v3/auth/me").hasAuthority("USER");
+
+                    // Book endpoints - READ public, WRITE protected
+                    auth.requestMatchers(HttpMethod.GET, "/api/v3/book/**").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/api/v3/book").hasAuthority("USER");
+                    auth.requestMatchers(HttpMethod.PUT, "/api/v3/book/**").hasAuthority("USER");
+                    auth.requestMatchers(HttpMethod.DELETE, "/api/v3/book/**").hasAuthority("USER");
+
+                    // Comment endpoints - READ public, WRITE protected
+                    auth.requestMatchers(HttpMethod.GET, "/api/v3/comment/**").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/api/v3/comment").hasAuthority("USER");
+                    auth.requestMatchers(HttpMethod.PUT, "/api/v3/comment/**").hasAuthority("USER");
+                    auth.requestMatchers(HttpMethod.DELETE, "/api/v3/comment/**").hasAuthority("USER");
+
+                    // Rating endpoints - READ public, WRITE protected
+                    auth.requestMatchers(HttpMethod.GET, "/api/v3/rating/**").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/api/v3/rating").hasAuthority("USER");
+                    auth.requestMatchers(HttpMethod.PUT, "/api/v3/rating/**").hasAuthority("USER");
+                    auth.requestMatchers(HttpMethod.DELETE, "/api/v3/rating/**").hasAuthority("USER");
+
+                    // Borrow - MUST be protected!
+                    auth.requestMatchers("/api/v3/borrow/**").hasAuthority("USER");
+
+                    // AI & other public endpoints
+                    auth.requestMatchers("/api/v3/ai/books/**").permitAll();
+                    auth.requestMatchers("/api/v3/version").permitAll();
+                    auth.requestMatchers("/api/v3/features/**").permitAll();
+
+                    // GitHub OAuth (if enabled)
+                    if (oauth2Properties.isEnabled()) {
+                        auth.requestMatchers("/api/v3/github/**").permitAll();
+                    }
+
+                    // Default - all other requests require authentication
+                    auth.anyRequest().authenticated();
+                })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class); // Add JwtAuthFilter
+                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
 
         if (oauth2Properties.isEnabled()) {
             System.out.println("Oauth2 enabled");
             http
-                    .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/api/v3/github/**").permitAll()
-                    )
                     .oauth2Login(Customizer.withDefaults())
                     .formLogin(Customizer.withDefaults());
         }
