@@ -1,18 +1,12 @@
-FROM node:20.18.0-slim AS build
+FROM node:24-slim AS build
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 COPY . .
-RUN npm run build --prod
+RUN npx ng build --configuration=production
 
 FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
 COPY ./config/nginx.conf /etc/nginx/conf.d/default.conf
-
-COPY ./config/init.sh /usr/share/init.sh
-RUN chmod +x /usr/share/init.sh
-
 EXPOSE 80
-ENTRYPOINT ["/usr/share/init.sh"]
 CMD ["nginx", "-g", "daemon off;"]

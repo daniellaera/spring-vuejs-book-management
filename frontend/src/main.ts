@@ -1,25 +1,6 @@
-import { createApp } from 'vue';
-import App from './App.vue';
-import router from '@/router'; // this should match the alias set in vite.config.ts
-import PrimeVue from 'primevue/config';
-import Aura from '@primevue/themes/aura';
-import 'primeicons/primeicons.css'
-import ToastService from 'primevue/toastservice';
-import Tooltip from "primevue/tooltip";
-import ConfirmationService from 'primevue/confirmationservice';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { App } from './app/app';
 
-const app = createApp(App);
-
-app.use(PrimeVue, {
-  theme: {
-    preset: Aura,
-    options: {
-      darkModeSelector: '.my-app-dark', // <-- this selector triggers dark mode
-    },
-  }
-});
-app.use(router);
-app.use(ToastService);
-app.directive('tooltip', Tooltip);
-app.use(ConfirmationService);
-app.mount('#app');
+bootstrapApplication(App, appConfig)
+  .catch((err) => console.error(err));

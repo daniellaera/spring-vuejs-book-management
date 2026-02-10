@@ -1,0 +1,19 @@
+.rating-form {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  background: var(--surface-50);
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  ::ng-deep .p-rating {
+    .p-rating-option {
+      font-size: 2rem;
+    }
+  }
+}

@@ -1,0 +1,123 @@
+<div class="create-book-container">
+  <p-toast></p-toast>
+
+  <p-card class="create-book-card">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <i class="pi pi-book text-6xl"></i>
+        <h2 class="text-3xl font-bold mt-3">Create a New Book</h2>
+        <p class="text-color-secondary">Add a new book to the library</p>
+      </div>
+    </ng-template>
+
+    <form (ngSubmit)="submitForm()" class="book-form">
+      <!-- Title -->
+      <div class="form-field">
+        <label for="title" class="block font-semibold mb-2">Title</label>
+        <input
+          pInputText
+          id="title"
+          type="text"
+          [(ngModel)]="book().title"
+          name="title"
+          placeholder="Enter the book title"
+          class="w-full"
+          required />
+      </div>
+
+      <!-- Author -->
+      <div class="form-field">
+        <label for="author" class="block font-semibold mb-2">Author</label>
+        <input
+          pInputText
+          id="author"
+          type="text"
+          [(ngModel)]="book().author"
+          name="author"
+          placeholder="Enter the author's name"
+          class="w-full"
+          required />
+      </div>
+
+      <!-- ISBN -->
+      <div class="form-field">
+        <label for="isbn" class="block font-semibold mb-2">ISBN</label>
+        <input
+          pInputText
+          id="isbn"
+          type="text"
+          [(ngModel)]="book().isbn"
+          name="isbn"
+          placeholder="Enter the ISBN"
+          class="w-full"
+          required />
+      </div>
+
+      <!-- Genre -->
+      <div class="form-field">
+        <label for="genre" class="block font-semibold mb-2">Genre</label>
+        <input
+          pInputText
+          id="genre"
+          type="text"
+          [(ngModel)]="book().genre"
+          name="genre"
+          placeholder="Enter the book genre"
+          class="w-full"
+          required />
+      </div>
+
+      <!-- Published Date -->
+      <div class="form-field">
+        <label for="publishedDate" class="block font-semibold mb-2">Published Date</label>
+        <p-datePicker
+          [(ngModel)]="book().publishedDate"
+          name="publishedDate"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          placeholder="Select the published date"
+          styleClass="w-full"
+          [inputStyle]="{ width: '100%' }"
+          required>
+        </p-datePicker>
+      </div>
+
+      <!-- Description -->
+      <div class="form-field">
+        <label for="description" class="block font-semibold mb-2">Description</label>
+        <textarea
+          pInputTextarea
+          id="description"
+          [(ngModel)]="book().description"
+          name="description"
+          placeholder="Enter the book description"
+          rows="5"
+          class="w-full"
+          required>
+        </textarea>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3 mt-4">
+        <p-button
+          type="submit"
+          label="Create Book"
+          icon="pi pi-check"
+          [loading]="loading()"
+          [disabled]="!isFormValid() || loading()"
+          styleClass="flex-1">
+        </p-button>
+
+        <p-button
+          type="button"
+          label="Cancel"
+          icon="pi pi-times"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="cancel()"
+          styleClass="flex-1">
+        </p-button>
+      </div>
+    </form>
+  </p-card>
+</div>

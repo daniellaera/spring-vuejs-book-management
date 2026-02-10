@@ -1,0 +1,247 @@
+<div class="book-detail-container">
+  @if (loading()) {
+    <div class="flex align-items-center justify-content-center" style="min-height: 400px">
+      <i class="pi pi-spin pi-spinner text-4xl text-primary"></i>
+    </div>
+  } @else if (book()) {
+    <p-card class="book-detail-card">
+      <!-- Header Image -->
+      <ng-template pTemplate="header">
+        <img
+          [ngSrc]="book()!.image || 'https://picsum.photos/800/300?random=' + book()!.id"
+          alt="Book cover"
+          width="800"
+          height="300"
+          priority
+          class="header-image" />
+      </ng-template>
+
+      <!-- Title & Availability -->
+      <ng-template pTemplate="title">
+        <div class="flex justify-content-between align-items-center flex-wrap gap-3">
+          <div>
+            <h1 class="text-4xl font-bold m-0">{{ book()!.title }}</h1>
+            <p class="text-xl text-color-secondary mt-2">by {{ book()!.author }}</p>
+          </div>
+          <p-tag
+            [value]="getAvailabilityTag().text"
+            [severity]="getAvailabilityTag().severity"
+            [rounded]="true"
+            class="text-lg px-3 py-2">
+          </p-tag>
+        </div>
+      </ng-template>
+
+      <!-- Book Details -->
+      <ng-template pTemplate="content">
+        <div class="grid">
+          <!-- Left Column - Details -->
+          <div class="col-12 lg:col-8">
+            <div class="detail-section">
+              <h3 class="text-2xl font-semibold mb-3">
+                <i class="pi pi-info-circle mr-2"></i>
+                Book Information
+              </h3>
+
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">ISBN</span>
+                  <span class="font-mono">{{ book()!.isbn }}</span>
+                </div>
+
+                <div class="info-item">
+                  <span class="info-label">Genre</span>
+                  <p-tag [value]="book()!.genre || 'N/A'" severity="secondary"></p-tag>
+                </div>
+
+                <div class="info-item">
+                  <span class="info-label">Published</span>
+                  <span>{{ formatDate(book()!.publishedDate) }}</span>
+                </div>
+
+                <div class="info-item">
+                  <span class="info-label">Rating</span>
+                  <span class="text-xl">
+                    {{ getRatingStars(book()!.averageRating) }}
+                    <span class="text-color-secondary ml-2">({{ book()!.averageRating }}/5)</span>
+                  </span>
+                </div>
+              </div>
+
+              <p-divider></p-divider>
+
+              <div class="description-section">
+                <h4 class="text-xl font-semibold mb-2">Description</h4>
+                <p class="text-color-secondary line-height-3">
+                  {{ book()!.description }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Comments Section -->
+            @if (book()?.comments && book()!.comments!.length > 0) {
+              <div class="comments-section mt-4">
+                <h3 class="text-2xl font-semibold mb-3">
+                  <i class="pi pi-comments mr-2"></i>
+                  Comments ({{ book()!.comments!.length }})
+                </h3>
+
+                @for (comment of book()!.comments; track $index) {
+                  <div class="comment-card mb-3">
+                    <div class="flex align-items-center gap-2 mb-2">
+                      <i class="pi pi-user text-primary"></i>
+                      <span class="font-semibold">{{ comment.authorFullName }}</span>
+                    </div>
+                    <p class="text-color-secondary m-0">{{ comment.content }}</p>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Add Comment Section -->
+            <div class="add-comment-section">
+              <app-comment-form
+                [bookId]="book()!.id"
+                (commentAdded)="reloadBook()">
+              </app-comment-form>
+            </div>
+
+          </div>
+
+          <!-- Right Column - Borrow Info & Ratings -->
+          <div class="col-12 lg:col-4">
+            <!-- Borrow Section -->
+            <div class="borrow-section">
+              <h3 class="text-xl font-semibold mb-3">
+                <i class="pi pi-calendar mr-2"></i>
+                Borrow Status
+              </h3>
+
+              @if (hasBorrow()) {
+                <div class="borrow-info-card">
+                  <p class="font-semibold mb-3">Currently Borrowed</p>
+                  <p-datePicker
+                    [(ngModel)]="borrowDates"
+                    selectionMode="range"
+                    [inline]="true"
+                    [showWeek]="true"
+                    [readonlyInput]="true"
+                    dateFormat="dd/mm/yy">
+                  </p-datePicker>
+                </div>
+              } @else {
+                <div class="available-card">
+                  <i class="pi pi-check-circle text-4xl text-green-500 mb-2"></i>
+                  <p class="font-semibold">Available to Borrow</p>
+
+                  @if (!authService.isLoggedIn()) {
+                    <p class="text-sm text-color-secondary mt-2">
+                      Please log in to borrow this book
+                    </p>
+                  }
+
+                  <p-button
+                    [label]="authService.isLoggedIn() ? 'Borrow This Book' : 'Login to Borrow'"
+                    icon="pi pi-calendar-plus"
+                    styleClass="w-full mt-3"
+                    [disabled]="!authService.isLoggedIn()"
+                    (onClick)="openBorrowDialog()">
+                  </p-button>
+                </div>
+              }
+            </div>
+
+            <!-- Borrow Dialog -->
+            <p-dialog
+              header="Borrow Book"
+              [(visible)]="showBorrowDialog"
+              [modal]="true"
+              [style]="{ width: '450px' }">
+
+              <div class="flex flex-column gap-3">
+                <p>Select the borrow period for <strong>{{ book()?.title }}</strong></p>
+
+                <p-datePicker
+                  [(ngModel)]="selectedBorrowDates"
+                  selectionMode="range"
+                  [inline]="true"
+                  [minDate]="minDate"
+                  [maxDate]="maxDate"
+                  dateFormat="dd/mm/yy">
+                </p-datePicker>
+              </div>
+
+              <ng-template pTemplate="footer">
+                <p-button
+                  label="Cancel"
+                  severity="secondary"
+                  [outlined]="true"
+                  (onClick)="showBorrowDialog.set(false)">
+                </p-button>
+                <p-button
+                  label="Confirm Borrow"
+                  icon="pi pi-check"
+                  (onClick)="confirmBorrow()">
+                </p-button>
+              </ng-template>
+            </p-dialog>
+
+            <!-- Submit Rating Section -->
+            <div class="submit-rating-section mt-4">
+              <app-rating-form
+                [sessionUserId]="authService.userDetails().userId ?? 0"
+                [bookId]="book()!.id"
+                [bookRatings]="book()!.ratings"
+                (ratingAdded)="reloadBook()">
+              </app-rating-form>
+            </div>
+
+            <!-- Ratings Section -->
+            @if (book()?.ratings && book()!.ratings!.length > 0) {
+              <div class="ratings-section mt-4">
+                <h3 class="text-xl font-semibold mb-3">
+                  <i class="pi pi-star-fill mr-2" style="color: #fbbf24"></i>
+                  Ratings
+                </h3>
+
+                @for (rating of book()!.ratings; track $index) {
+                  <div class="rating-item">
+        <span class="rating-stars">
+          {{ getRatingStars(rating.score) }}
+        </span>
+                    <span class="text-color-secondary ml-2">({{ rating.score }}/5)</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </ng-template>
+
+      <!-- Footer Actions -->
+      <ng-template pTemplate="footer">
+        <div class="flex justify-content-between flex-wrap gap-2">
+          <p-button
+            label="Back to Books"
+            icon="pi pi-arrow-left"
+            [outlined]="true"
+            (onClick)="goBack()">
+          </p-button>
+
+          @if (isOwner()) {
+            <p-button
+              label="Delete Book"
+              icon="pi pi-trash"
+              severity="danger"
+              [outlined]="true"
+              (onClick)="confirmDelete()">
+            </p-button>
+          }
+        </div>
+      </ng-template>
+    </p-card>
+  }
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

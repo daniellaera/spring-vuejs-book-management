@@ -1,0 +1,84 @@
+:host {
+  display: block;
+  margin-bottom: 2rem;
+}
+
+.user-menu {
+  position: relative;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--surface-border);
+}
+
+.session-timer {
+  background: var(--primary-50);
+  border: 1px solid var(--primary-200);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.session-expired {
+  border: 1px solid var(--red-200);
+  animation: shake 0.5s ease-in-out;
+}
+
+.theme-toggle {
+  background: var(--surface-50);
+  border: 1px solid var(--surface-border);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: var(--surface-100);
+  }
+}
+
+.pulse-badge {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse {
+  animation: pulse-icon 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-icon {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}

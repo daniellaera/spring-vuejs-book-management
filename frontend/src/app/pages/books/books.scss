@@ -1,0 +1,79 @@
+.books-container {
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  background: var(--surface-ground);
+  min-height: calc(100vh - 80px);
+}
+
+.header-card {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  ::ng-deep .p-card-body {
+    padding: 1.5rem;
+  }
+}
+
+.content-card {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  ::ng-deep .p-card-body {
+    padding: 1.5rem;
+  }
+}
+
+// Custom table styling
+::ng-deep {
+  .p-datatable {
+    .p-datatable-header {
+      background: var(--surface-card);
+      border: none;
+      padding: 1rem;
+    }
+
+    .p-datatable-thead > tr > th {
+      background: var(--surface-card);
+      color: var(--text-color);
+      font-weight: 600;
+      border-bottom: 2px solid var(--surface-border);
+      padding: 1rem;
+    }
+
+    .p-datatable-tbody > tr {
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--surface-hover) !important;
+      }
+
+      > td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--surface-border);
+      }
+    }
+  }
+
+  .p-paginator {
+    border: none;
+    background: var(--surface-card);
+    padding: 1rem;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .books-container {
+    padding: 1rem;
+  }
+
+  ::ng-deep .p-datatable {
+    font-size: 0.875rem;
+
+    .p-datatable-thead > tr > th,
+    .p-datatable-tbody > tr > td {
+      padding: 0.75rem;
+    }
+  }
+}

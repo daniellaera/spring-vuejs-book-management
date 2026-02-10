@@ -1,0 +1,91 @@
+<div class="profile-container">
+  <p-toast></p-toast>
+
+  <p-card class="profile-card">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <i class="pi pi-user text-6xl"></i>
+        <h2 class="text-3xl font-bold mt-3">Profile Settings</h2>
+        <p class="text-color-secondary">Update your personal information</p>
+      </div>
+    </ng-template>
+
+    <form (ngSubmit)="saveProfile()" class="profile-form">
+      <!-- Email (Read-only) -->
+      <div class="form-field">
+        <label for="email" class="block font-semibold mb-2">
+          Email
+          <span class="text-color-secondary text-sm font-normal ml-2">(cannot be changed)</span>
+        </label>
+        <input
+          pInputText
+          id="email"
+          type="email"
+          [ngModel]="email()"
+          name="email"
+          class="w-full"
+          [disabled]="true" />
+      </div>
+
+      <!-- First Name -->
+      <div class="form-field">
+        <label for="firstName" class="block font-semibold mb-2">First Name</label>
+        <input
+          pInputText
+          id="firstName"
+          type="text"
+          [(ngModel)]="firstName"
+          (ngModelChange)="validateFirstName()"
+          name="firstName"
+          placeholder="Enter your first name"
+          class="w-full"
+          [class.p-invalid]="firstNameError()"
+          required />
+        @if (firstNameError()) {
+          <p-message severity="error" styleClass="mt-2">{{ firstNameError() }}</p-message>
+        }
+      </div>
+
+      <!-- Last Name -->
+      <div class="form-field">
+        <label for="lastName" class="block font-semibold mb-2">Last Name</label>
+        <input
+          pInputText
+          id="lastName"
+          type="text"
+          [(ngModel)]="lastName"
+          (ngModelChange)="validateLastName()"
+          name="lastName"
+          placeholder="Enter your last name"
+          class="w-full"
+          [class.p-invalid]="lastNameError()"
+          required />
+        @if (lastNameError()) {
+          <p-message severity="error" styleClass="mt-2">{{ lastNameError() }}</p-message>
+        }
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3 mt-4">
+        <p-button
+          type="submit"
+          label="Save Changes"
+          icon="pi pi-check"
+          [loading]="loading()"
+          [disabled]="!isFormValid() || loading()"
+          styleClass="flex-1">
+        </p-button>
+
+        <p-button
+          type="button"
+          label="Cancel"
+          icon="pi pi-times"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="cancel()"
+          styleClass="flex-1">
+        </p-button>
+      </div>
+    </form>
+  </p-card>
+</div>

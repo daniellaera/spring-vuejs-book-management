@@ -1,0 +1,38 @@
+<div class="comment-form">
+  <textarea
+    pInputTextarea
+    [(ngModel)]="commentContent"
+    placeholder="Write your comment..."
+    rows="3"
+    maxlength="500"
+    class="w-full"
+    [disabled]="isSubmitting()">
+  </textarea>
+
+  <div class="flex justify-content-between align-items-center mt-2">
+    <small class="text-color-secondary">
+      {{ commentContent().length }}/500 characters
+    </small>
+  </div>
+
+  <p-button
+    [label]="getButtonLabel()"
+    icon="pi pi-send"
+    [disabled]="isSubmitDisabled()"
+    [loading]="isSubmitting()"
+    (onClick)="submitComment()"
+    styleClass="w-full mt-3">
+  </p-button>
+
+  @if (errorMessage()) {
+    <p-message severity="error" styleClass="mt-2 w-full">
+      {{ errorMessage() }}
+    </p-message>
+  }
+
+  @if (!authService.isLoggedIn()) {
+    <p-message severity="warn" styleClass="mt-2 w-full">
+      Please log in to post a comment.
+    </p-message>
+  }
+</div>

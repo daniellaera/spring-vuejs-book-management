@@ -1,0 +1,99 @@
+<div class="auth-container">
+  <p-card class="auth-card">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <i [class]="isLoginMode ? 'pi pi-sign-in text-6xl' : 'pi pi-user-plus text-6xl'"></i>
+        <h2 class="text-3xl font-bold mt-3">
+          {{ isLoginMode ? 'Welcome Back' : 'Create Account' }}
+        </h2>
+        <p class="text-color-secondary">
+          {{ isLoginMode ? 'Sign in to your account' : 'Sign up to get started' }}
+        </p>
+      </div>
+    </ng-template>
+
+    <form (ngSubmit)="handleSubmit()" class="auth-form">
+      <!-- Email -->
+      <div class="form-field">
+        <label for="email" class="block font-semibold mb-2">Email</label>
+        <input
+          pInputText
+          id="email"
+          type="email"
+          [(ngModel)]="email"
+          (ngModelChange)="validateEmail()"
+          name="email"
+          placeholder="Enter your email"
+          class="w-full"
+          [class.p-invalid]="emailError()"
+          required />
+        @if (emailError()) {
+          <p-message severity="error" styleClass="mt-2">{{ emailError() }}</p-message>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="form-field">
+        <label for="password" class="block font-semibold mb-2">Password</label>
+        <p-password
+          [(ngModel)]="password"
+          (ngModelChange)="validatePassword()"
+          name="password"
+          [placeholder]="isLoginMode ? 'Enter your password' : 'Create a password (min 6 characters)'"
+          [toggleMask]="true"
+          [feedback]="!isLoginMode"
+          styleClass="w-full"
+          [inputStyle]="{ width: '100%' }"
+          [class.p-invalid]="passwordError()">
+        </p-password>
+        @if (passwordError()) {
+          <p-message severity="error" styleClass="mt-2">{{ passwordError() }}</p-message>
+        }
+      </div>
+
+      <!-- Error Message -->
+      @if (errorMessage()) {
+        <p-message severity="error" styleClass="w-full">
+          {{ errorMessage() }}
+        </p-message>
+      }
+
+      <!-- Submit Button -->
+      <p-button
+        type="submit"
+        [label]="isLoginMode ? 'Sign In' : 'Create Account'"
+        [icon]="isLoginMode ? 'pi pi-sign-in' : 'pi pi-user-plus'"
+        [loading]="loading()"
+        [disabled]="!isFormValid() || loading()"
+        styleClass="w-full">
+      </p-button>
+
+      @if (isLoginMode && oauth2Enabled()) {
+        <p-divider align="center">
+          <span class="text-color-secondary">OR</span>
+        </p-divider>
+
+        <!-- GitHub Login -->
+        <p-button
+          type="button"
+          label="Continue with GitHub"
+          icon="pi pi-github"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="loginWithGitHub()"
+          styleClass="w-full">
+        </p-button>
+      }
+
+      <!-- Switch Mode Link -->
+      <div class="text-center mt-4">
+        <p class="text-color-secondary">
+          {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}
+          <a (click)="switchMode()" class="text-primary font-semibold cursor-pointer">
+            {{ isLoginMode ? 'Sign Up' : 'Sign In' }}
+          </a>
+        </p>
+      </div>
+    </form>
+  </p-card>
+</div>

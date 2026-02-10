@@ -1,0 +1,167 @@
+<div class="books-container">
+  <p-card class="header-card">
+    <div class="flex justify-content-between align-items-center flex-wrap gap-3">
+      <div>
+        <h1 class="text-4xl font-bold m-0 mb-2">
+          <i class="pi pi-book mr-2" style="color: var(--primary-color)"></i>
+          Book Library
+        </h1>
+        <p class="text-color-secondary m-0">Manage your book collection</p>
+      </div>
+      <p-button
+        label="Add Book"
+        icon="pi pi-plus"
+        severity="success"
+        [raised]="true"
+        (click)="editBook()">
+      </p-button>
+    </div>
+  </p-card>
+
+  <p-card class="content-card mt-4">
+    <div class="flex gap-3 mb-4 flex-wrap">
+      <p-iconField iconPosition="left" class="flex-1" style="min-width: 250px">
+        <p-inputIcon class="pi pi-search"></p-inputIcon>
+        <input
+          pInputText
+          type="text"
+          [(ngModel)]="searchKeyword"
+          (keyup.enter)="onSearch()"
+          placeholder="Search by title or author..."
+          class="w-full" />
+      </p-iconField>
+
+      <p-button
+        label="Search"
+        icon="pi pi-search"
+        (click)="onSearch()"
+        [outlined]="true">
+      </p-button>
+
+      <p-button
+        label="Clear"
+        icon="pi pi-filter-slash"
+        severity="secondary"
+        [outlined]="true"
+        (click)="clearSearch()">
+      </p-button>
+    </div>
+
+    <p-table
+      #dt
+      [value]="books"
+      [loading]="loading"
+      [lazy]="true"
+      (onLazyLoad)="loadBooks($event)"
+      [paginator]="true"
+      [rows]="rows"
+      [totalRecords]="totalRecords"
+      [(first)]="first"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} books"
+      [rowsPerPageOptions]="[5, 10, 25, 50]"
+      [tableStyle]="{'min-width': '60rem'}"
+      [rowHover]="true"
+      class="p-datatable-striped">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="title" style="width: 25%">
+            <div class="flex align-items-center">
+              Title <p-sortIcon field="title"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="author" style="width: 18%">
+            <div class="flex align-items-center">
+              Author <p-sortIcon field="author"></p-sortIcon>
+            </div>
+          </th>
+          <th style="width: 12%">Genre</th>
+          <th style="width: 12%">ISBN</th>
+          <th pSortableColumn="averageRating" style="width: 10%">
+            <div class="flex align-items-center">
+              Rating <p-sortIcon field="averageRating"></p-sortIcon>
+            </div>
+          </th>
+          <th style="width: 10%">Status</th>
+          <th style="width: 13%">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-book>
+        <tr>
+          <td>
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-book text-2xl" style="color: var(--primary-color)"></i>
+              <div>
+                <div class="font-semibold">{{ book.title }}</div>
+                @if (book.publishedDate) {
+                  <small class="text-color-secondary">
+                    Published {{ book.publishedDate | date: 'yyyy' }}
+                  </small>
+                }
+              </div>
+            </div>
+          </td>
+          <td>{{ book.author }}</td>
+          <td>
+            <p-tag [value]="book.genre || 'N/A'" severity="secondary" [rounded]="true"></p-tag>
+          </td>
+          <td><span class="font-mono text-sm">{{ book.isbn }}</span></td>
+          <td>
+            @if (book.averageRating) {
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-star-fill" style="color: #fbbf24"></i>
+                <span class="font-semibold">{{ book.averageRating }}</span>
+              </div>
+            } @else {
+              <span class="text-color-secondary text-sm">No ratings</span>
+            }
+          </td>
+          <td>
+            <p-tag [severity]="getAvailabilitySeverity(book.isAvailable)" [rounded]="true">
+              <i [class]="book.isAvailable ? 'pi pi-check' : 'pi pi-times'" class="mr-1"></i>
+              {{ book.isAvailable ? 'Available' : 'Borrowed' }}
+            </p-tag>
+          </td>
+          <td>
+            <div class="flex gap-2">
+              <p-button
+                icon="pi pi-eye"
+                [rounded]="true"
+                [outlined]="true"
+                severity="info"
+                size="small"
+                (click)="viewBook(book)"
+                pTooltip="View Details"
+                tooltipPosition="top">
+              </p-button>
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [outlined]="true"
+                severity="warn"
+                size="small"
+                (click)="editBook(book)"
+                pTooltip="Edit"
+                tooltipPosition="top">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <div class="flex flex-column align-items-center justify-content-center p-6">
+              <i class="pi pi-inbox text-6xl text-color-secondary mb-3"></i>
+              <h3 class="text-xl font-semibold mb-2">No books found</h3>
+              <p class="text-color-secondary m-0">Try adjusting your search or add a new book</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

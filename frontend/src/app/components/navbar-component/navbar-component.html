@@ -1,0 +1,73 @@
+<p-toolbar>
+  <div class="flex align-items-center gap-4">
+    <!-- Logo & Title -->
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-book text-primary" style="font-size: 1.5rem"></i>
+      <span class="font-bold text-xl">Book Management</span>
+    </div>
+
+    <!-- Divider -->
+    <div class="toolbar-divider"></div>
+
+    <!-- Session Status -->
+    @if (isLoggedIn() && getTimeLeft() > 0) {
+      <div class="session-timer flex align-items-center gap-2 px-3 py-2 border-round-lg surface-border">
+        <i class="pi pi-clock text-primary animate-pulse"></i>
+        <span class="text-sm font-medium">Session:</span>
+        <p-badge
+          [value]="formatTimeLeft()"
+          [severity]="getTimeLeft() < 60 ? 'warn' : 'info'"
+          class="pulse-badge">
+        </p-badge>
+      </div>
+    } @else if (!isLoggedIn() || getTimeLeft() <= 0) {
+      <div class="session-expired flex align-items-center gap-2 px-3 py-2 border-round-lg bg-red-50">
+        <i class="pi pi-exclamation-triangle text-red-500 animate-shake"></i>
+        <p-badge
+          value="Session Expired"
+          severity="danger">
+        </p-badge>
+      </div>
+    }
+  </div>
+
+  <div class="flex align-items-center gap-4">
+    <!-- Theme Toggle -->
+    <div class="theme-toggle flex align-items-center gap-2 px-3 py-2 border-round-lg surface-border">
+      <i class="pi pi-sun text-yellow-500" style="font-size: 1.1rem"></i>
+      <p-toggleswitch
+        [(ngModel)]="isDarkMode"
+        (onChange)="toggleTheme()">
+      </p-toggleswitch>
+      <i class="pi pi-moon text-blue-400" style="font-size: 1.1rem"></i>
+    </div>
+
+    <!-- Divider -->
+    <div class="toolbar-divider"></div>
+
+    <!-- Books Link -->
+    <p-button
+      label="Books"
+      icon="pi pi-book"
+      [text]="true"
+      routerLink="/books">
+    </p-button>
+
+    <!-- User Menu -->
+    <div class="user-menu">
+      <p-button
+        [label]="isLoggedIn() ? getFullName() : 'Account'"
+        [icon]="isLoggedIn() && hasGitHub() ? 'pi pi-github' : 'pi pi-user'"
+        [text]="true"
+        (click)="menu.toggle($event); updateMenu(); $event.stopPropagation()">
+      </p-button>
+
+      <p-menu
+        #menu
+        [model]="userMenuItems"
+        [popup]="true"
+        appendTo="body">
+      </p-menu>
+    </div>
+  </div>
+</p-toolbar>
