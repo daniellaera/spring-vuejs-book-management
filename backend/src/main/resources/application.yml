@@ -60,14 +60,14 @@ ai:
 ollama:
   api-url: ${OLLAMA_URL}
 
+server:
+  forward-headers-strategy: framework
+
 springdoc:
   api-docs:
     path: /api-docs
   swagger-ui:
-    # This sets the actual web path
     path: /swagger-ui.html
-    # This ensures the internal resources are mapped correctly
-    operations-sorter: alpha
-
-server:
-  forward-headers-strategy: framework
+  # This forces the generated OpenAPI JSON to use the correct server URL
+  server-variable:
+    url: https://bookmanagement.daniellaera.com
