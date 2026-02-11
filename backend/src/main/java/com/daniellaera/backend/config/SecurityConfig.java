@@ -80,7 +80,6 @@ public class SecurityConfig {
                         auth.requestMatchers("/api/v3/github/**").permitAll();
                     }
 
-                    // Default - all other requests require authentication
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

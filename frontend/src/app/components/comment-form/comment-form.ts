@@ -3,13 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
-// PrimeNG
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
-import {Textarea} from 'primeng/textarea';
+import { Textarea } from 'primeng/textarea';
 
 @Component({
   selector: 'app-comment-form',
