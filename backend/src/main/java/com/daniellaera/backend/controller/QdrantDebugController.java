@@ -9,14 +9,14 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v3/ai")
-public class AiDebugController {
+public class QdrantDebugController {
 
     private final WebClient webClient;
 
     @Value("${qdrant.url}")
     private String qdrantUrl;
 
-    public AiDebugController(WebClient.Builder builder) {
+    public QdrantDebugController(WebClient.Builder builder) {
         this.webClient = builder.build();
     }
 

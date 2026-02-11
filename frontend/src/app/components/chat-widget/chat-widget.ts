@@ -6,8 +6,8 @@ import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
 import { ChatAiService } from '../../services/chat-ai.service';
 import { AuthService } from '../../services/auth.service';
-import {ChatMessage} from '../../models/chat-message.model';
-import {InputText} from 'primeng/inputtext';
+import { ChatMessage } from '../../models/chat-message.model';
+import { InputText } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-chat-widget',
@@ -52,7 +52,7 @@ export class ChatWidget {
     const question = this.userMessage.trim();
     if (!question || this.isLoading()) return;
 
-    // Add user message
+    // add user message
     this.messages.update(msgs => [...msgs, {
       role: 'user' as const,
       content: question,
