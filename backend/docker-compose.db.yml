@@ -17,5 +17,16 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant-data:/qdrant/storage
+
 volumes:
   book-management-data:
+  qdrant-data:

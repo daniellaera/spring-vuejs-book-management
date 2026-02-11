@@ -18,6 +18,16 @@ spring:
             client-id: ${GITHUB_CLIENT_ID}
             client-secret: ${GITHUB_SECRET}
             redirect-uri: ${GITHUB_REDIRECT_URI}
+
+  ai:
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY}
+      chat:
+        options:
+          model: claude-sonnet-4-20250514
+          max-tokens: 1024
+          temperature: 0.2
+
 jwt:
   secret: ${JWT_SECRET}
   expiration: 86400000
@@ -38,3 +48,14 @@ quartz:
 app:
   version: @project.version@
   build-time: @maven.build.timestamp@
+
+qdrant:
+  url: ${QDRANT_URL}
+  collection: books
+
+ai:
+  enabled: true
+  daily-limit: 20
+
+ollama:
+  api-url: ${OLLAMA_URL}

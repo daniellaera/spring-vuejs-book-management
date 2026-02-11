@@ -1,0 +1,90 @@
+<!-- Floating chat bubble -->
+<div class="chat-widget">
+
+  <!-- Toggle button -->
+  <button
+    class="chat-toggle"
+    (click)="toggleChat()"
+    pTooltip="Library Assistant"
+    tooltipPosition="left">
+    @if (isOpen()) {
+      <i class="pi pi-times"></i>
+    } @else {
+      <i class="pi pi-sparkles"></i>
+    }
+  </button>
+
+  <!-- Chat panel -->
+  @if (isOpen()) {
+    <div class="chat-panel">
+
+      <!-- Header -->
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <i class="pi pi-bolt"></i>
+          <span>Library Assistant</span>
+        </div>
+        <button class="chat-header-btn" (click)="clearChat()" pTooltip="Clear chat">
+          <i class="pi pi-trash"></i>
+        </button>
+      </div>
+
+      @if (isLoggedIn()) {
+        <!-- Messages -->
+        <div class="chat-messages" #messagesContainer>
+          @for (msg of messages(); track msg.timestamp) {
+            <div class="chat-msg" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+              @if (msg.role === 'assistant') {
+                <div class="msg-avatar">
+                  <i class="pi pi-bolt"></i>
+                </div>
+              }
+              <div class="msg-bubble">
+                <span>{{ msg.content }}</span>
+                @if (msg.isStreaming) {
+                  <span class="streaming-cursor">▊</span>
+                }
+              </div>
+            </div>
+          }
+
+          @if (isLoading() && messages().length > 0 && !messages()[messages().length - 1].isStreaming) {
+            <div class="chat-msg assistant">
+              <div class="msg-avatar">
+                <i class="pi pi-bolt"></i>
+              </div>
+              <div class="msg-bubble typing">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input">
+          <input
+            type="text"
+            [(ngModel)]="userMessage"
+            (keydown)="onKeyDown($event)"
+            placeholder="Ask about our books..."
+            [disabled]="isLoading()"
+            pInputText />
+          <button
+            class="send-btn"
+            (click)="sendMessage()"
+            [disabled]="isLoading() || !userMessage.trim()">
+            <i class="pi pi-send"></i>
+          </button>
+        </div>
+      } @else {
+        <!-- Not logged in -->
+        <div class="chat-login-prompt">
+          <i class="pi pi-lock"></i>
+          <p>Please log in to use the library assistant.</p>
+        </div>
+      }
+    </div>
+  }
+</div>

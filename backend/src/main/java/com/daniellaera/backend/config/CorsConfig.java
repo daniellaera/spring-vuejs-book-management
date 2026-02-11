@@ -22,8 +22,7 @@ public class CorsConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
         // Allow multiple origins: development and production
-        List<String> allowedOrigins = Arrays.asList(
-                "http://localhost:5173",  // Local development
+        List<String> allowedOrigins = Collections.singletonList(
                 frontendUrl
         );
         corsConfiguration.setAllowedOrigins(allowedOrigins);

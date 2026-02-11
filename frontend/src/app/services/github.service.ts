@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
@@ -12,7 +12,8 @@ import {GitHubCallbackResponse} from '../models/github-callback-response.model';
 export class GithubService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+  }
 
   // Check if GitHub OAuth is enabled
   isGithubEnabled(): Observable<FeaturesResponse> {
@@ -26,6 +27,6 @@ export class GithubService {
 
   // Handle GitHub callback with code
   handleGithubCallback(code: string): Observable<GitHubCallbackResponse> {
-    return this.http.post<GitHubCallbackResponse>(`${this.apiUrl}/github/callback`, { code });
+    return this.http.post<GitHubCallbackResponse>(`${this.apiUrl}/github/callback`, {code});
   }
 }

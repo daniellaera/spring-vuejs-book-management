@@ -140,7 +140,6 @@ export class AuthService {
         this.fetchUserDetails();
       } else {
         // Token expired - clear it
-        console.log('Token expired, clearing session');
         this.resetSession();
         localStorage.removeItem('auth_token');
         localStorage.removeItem('username');

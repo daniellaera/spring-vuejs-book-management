@@ -69,7 +69,9 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/v3/borrow/**").hasAuthority("USER");
 
                     // AI & other public endpoints
-                    auth.requestMatchers("/api/v3/ai/books/**").permitAll();
+                    auth.requestMatchers("/api/v3/ai/books/ask/**").hasAuthority("USER");
+                    auth.requestMatchers("/api/v3/ai/books/remaining").hasAuthority("USER");
+                    auth.requestMatchers("/api/v3/ai/books/**").permitAll(); // index, search
                     auth.requestMatchers("/api/v3/version").permitAll();
                     auth.requestMatchers("/api/v3/features/**").permitAll();
 
