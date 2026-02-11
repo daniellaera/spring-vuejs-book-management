@@ -59,3 +59,12 @@ ai:
 
 ollama:
   api-url: ${OLLAMA_URL}
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    # This sets the actual web path
+    path: /swagger-ui.html
+    # This ensures the internal resources are mapped correctly
+    operations-sorter: alpha

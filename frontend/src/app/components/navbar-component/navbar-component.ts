@@ -93,9 +93,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   toggleTheme(): void {
-    // DON'T toggle isDarkMode here - ngModel already did it!
-    // this.isDarkMode = !this.isDarkMode; ← REMOVE THIS LINE
-
     if (this.isDarkMode) {
       document.documentElement.classList.add('my-app-dark');
       localStorage.setItem('theme', 'dark');
@@ -123,8 +120,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   formatTimeLeft(): string {
     const time = this.getTimeLeft();
-    const minutes = Math.floor(time / 60);
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
     const seconds = time % 60;
+
+    if (hours > 0) {
+      return `${hours}h ${minutes.toString().padStart(2, '0')}m`;
+    }
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 }

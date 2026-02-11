@@ -68,6 +68,9 @@ public class SecurityConfig {
                     // Borrow - MUST be protected!
                     auth.requestMatchers("/api/v3/borrow/**").hasAuthority("USER");
 
+                    // Open API
+                    auth.requestMatchers("/swagger-ui/**", "/api-docs/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-ui.html").permitAll();
+
                     // AI streaming public
                     auth.requestMatchers("/api/v3/ai/books/ask/stream").permitAll();
 

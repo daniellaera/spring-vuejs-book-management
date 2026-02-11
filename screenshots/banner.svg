@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400">
+    <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#1a1a2e"/>
+            <stop offset="50%" style="stop-color:#16213e"/>
+            <stop offset="100%" style="stop-color:#0f3460"/>
+        </linearGradient>
+        <linearGradient id="spring" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#6db33f"/>
+            <stop offset="100%" style="stop-color:#4a8c2a"/>
+        </linearGradient>
+        <linearGradient id="angular" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#dd0031"/>
+            <stop offset="100%" style="stop-color:#c3002f"/>
+        </linearGradient>
+        <linearGradient id="ai" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#d97706"/>
+            <stop offset="100%" style="stop-color:#b45309"/>
+        </linearGradient>
+        <linearGradient id="qdrant" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#7c3aed"/>
+            <stop offset="100%" style="stop-color:#5b21b6"/>
+        </linearGradient>
+        <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        <filter id="shadow">
+            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.3"/>
+        </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="900" height="400" fill="url(#bg)" rx="12"/>
+
+    <!-- Subtle grid pattern -->
+    <g opacity="0.05" stroke="#ffffff" stroke-width="0.5">
+        <line x1="0" y1="50" x2="900" y2="50"/>
+        <line x1="0" y1="100" x2="900" y2="100"/>
+        <line x1="0" y1="150" x2="900" y2="150"/>
+        <line x1="0" y1="200" x2="900" y2="200"/>
+        <line x1="0" y1="250" x2="900" y2="250"/>
+        <line x1="0" y1="300" x2="900" y2="300"/>
+        <line x1="0" y1="350" x2="900" y2="350"/>
+        <line x1="100" y1="0" x2="100" y2="400"/>
+        <line x1="200" y1="0" x2="200" y2="400"/>
+        <line x1="300" y1="0" x2="300" y2="400"/>
+        <line x1="400" y1="0" x2="400" y2="400"/>
+        <line x1="500" y1="0" x2="500" y2="400"/>
+        <line x1="600" y1="0" x2="600" y2="400"/>
+        <line x1="700" y1="0" x2="700" y2="400"/>
+        <line x1="800" y1="0" x2="800" y2="400"/>
+    </g>
+
+    <!-- Decorative circles -->
+    <circle cx="80" cy="80" r="60" fill="#6db33f" opacity="0.06"/>
+    <circle cx="820" cy="320" r="80" fill="#dd0031" opacity="0.06"/>
+    <circle cx="450" cy="350" r="100" fill="#7c3aed" opacity="0.04"/>
+
+    <!-- Floating dots -->
+    <circle cx="150" cy="50" r="3" fill="#6db33f" opacity="0.4"/>
+    <circle cx="750" cy="70" r="2" fill="#dd0031" opacity="0.4"/>
+    <circle cx="50" cy="300" r="2.5" fill="#d97706" opacity="0.4"/>
+    <circle cx="850" cy="150" r="2" fill="#7c3aed" opacity="0.4"/>
+    <circle cx="400" cy="30" r="1.5" fill="#ffffff" opacity="0.3"/>
+    <circle cx="600" cy="380" r="2" fill="#ffffff" opacity="0.2"/>
+
+    <!-- Connection lines between tech icons -->
+    <g stroke="#ffffff" stroke-width="1" opacity="0.08" stroke-dasharray="4,4">
+        <line x1="200" y1="195" x2="370" y2="195"/>
+        <line x1="530" y1="195" x2="700" y2="195"/>
+        <line x1="450" y1="195" x2="450" y2="310"/>
+    </g>
+
+    <!-- Title -->
+    <text x="450" y="72" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#ffffff" filter="url(#shadow)">Book Management</text>
+    <text x="450" y="105" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#94a3b8" letter-spacing="3">FULL-STACK · AI-POWERED · SELF-HOSTED</text>
+
+    <!-- Spring Boot Icon -->
+    <g transform="translate(135, 155)" filter="url(#shadow)">
+        <rect x="0" y="0" width="80" height="80" rx="16" fill="#1e293b" stroke="#6db33f" stroke-width="1.5"/>
+        <!-- Spring leaf -->
+        <g transform="translate(40, 40)">
+            <circle r="24" fill="none" stroke="#6db33f" stroke-width="2" opacity="0.3"/>
+            <path d="M-8,-18 C-8,-18 -20,0 -8,12 C-2,18 8,14 12,8 C16,2 14,-8 8,-12 C2,-16 -8,-18 -8,-18Z" fill="#6db33f" opacity="0.9"/>
+            <path d="M-6,-14 C-6,-14 0,2 8,8" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+        </g>
+        <text x="40" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#6db33f" font-weight="600">Spring Boot</text>
+    </g>
+
+    <!-- Angular Icon -->
+    <g transform="translate(335, 155)" filter="url(#shadow)">
+        <rect x="0" y="0" width="80" height="80" rx="16" fill="#1e293b" stroke="#dd0031" stroke-width="1.5"/>
+        <!-- Angular shield -->
+        <g transform="translate(40, 38)">
+            <path d="M0,-22 L-20,0 L-16,16 L0,24 L16,16 L20,0 Z" fill="none" stroke="#dd0031" stroke-width="2"/>
+            <path d="M0,-14 L-12,2 L-9,12 L0,17 L9,12 L12,2 Z" fill="#dd0031" opacity="0.3"/>
+            <text x="0" y="5" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="700" fill="#dd0031">A</text>
+        </g>
+        <text x="40" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#dd0031" font-weight="600">Angular 21</text>
+    </g>
+
+    <!-- PostgreSQL Icon -->
+    <g transform="translate(535, 155)" filter="url(#shadow)">
+        <rect x="0" y="0" width="80" height="80" rx="16" fill="#1e293b" stroke="#336791" stroke-width="1.5"/>
+        <!-- Database cylinder -->
+        <g transform="translate(40, 36)">
+            <ellipse cx="0" cy="-14" rx="16" ry="6" fill="none" stroke="#336791" stroke-width="2"/>
+            <line x1="-16" y1="-14" x2="-16" y2="10" stroke="#336791" stroke-width="2"/>
+            <line x1="16" y1="-14" x2="16" y2="10" stroke="#336791" stroke-width="2"/>
+            <ellipse cx="0" cy="10" rx="16" ry="6" fill="none" stroke="#336791" stroke-width="2"/>
+            <ellipse cx="0" cy="-2" rx="16" ry="6" fill="none" stroke="#336791" stroke-width="1" opacity="0.4"/>
+        </g>
+        <text x="40" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#336791" font-weight="600">PostgreSQL</text>
+    </g>
+
+    <!-- Claude AI Icon -->
+    <g transform="translate(735, 155)" filter="url(#shadow)">
+        <rect x="0" y="0" width="80" height="80" rx="16" fill="#1e293b" stroke="#d4a27a" stroke-width="1.5"/>
+        <!-- Claude sunburst / asterisk shape -->
+        <g transform="translate(40, 36)">
+            <!-- Outer glow -->
+            <circle r="20" fill="#d4a27a" opacity="0.06"/>
+            <!-- 6 rounded petals radiating from center -->
+            <g fill="#d4a27a">
+                <!-- Top -->
+                <rect x="-2.5" y="-18" width="5" height="12" rx="2.5" opacity="0.85"/>
+                <!-- Top-right -->
+                <rect x="-2.5" y="-18" width="5" height="12" rx="2.5" opacity="0.7" transform="rotate(60)"/>
+                <!-- Bottom-right -->
+                <rect x="-2.5" y="-18" width="5" height="12" rx="2.5" opacity="0.85" transform="rotate(120)"/>
+                <!-- Bottom -->
+                <rect x="-2.5" y="-18" width="5" height="12" rx="2.5" opacity="0.7" transform="rotate(180)"/>
+                <!-- Bottom-left -->
+                <rect x="-2.5" y="-18" width="5" height="12" rx="2.5" opacity="0.85" transform="rotate(240)"/>
+                <!-- Top-left -->
+                <rect x="-2.5" y="-18" width="5" height="12" rx="2.5" opacity="0.7" transform="rotate(300)"/>
+            </g>
+            <!-- Center dot -->
+            <circle r="4" fill="#d4a27a" opacity="1"/>
+        </g>
+        <text x="40" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#d4a27a" font-weight="600">Claude AI</text>
+    </g>
+
+    <!-- Bottom row: Qdrant -->
+    <g transform="translate(360, 280)" filter="url(#shadow)">
+        <rect x="0" y="0" width="80" height="80" rx="16" fill="#1e293b" stroke="#7c3aed" stroke-width="1.5"/>
+        <!-- Vector dots pattern -->
+        <g transform="translate(40, 36)">
+            <circle cx="-10" cy="-10" r="3" fill="#7c3aed" opacity="0.8"/>
+            <circle cx="10" cy="-10" r="3" fill="#7c3aed" opacity="0.6"/>
+            <circle cx="0" cy="8" r="3" fill="#7c3aed" opacity="0.9"/>
+            <circle cx="-14" cy="4" r="2" fill="#7c3aed" opacity="0.4"/>
+            <circle cx="14" cy="4" r="2" fill="#7c3aed" opacity="0.4"/>
+            <line x1="-10" y1="-10" x2="10" y2="-10" stroke="#7c3aed" stroke-width="1" opacity="0.3"/>
+            <line x1="-10" y1="-10" x2="0" y2="8" stroke="#7c3aed" stroke-width="1" opacity="0.3"/>
+            <line x1="10" y1="-10" x2="0" y2="8" stroke="#7c3aed" stroke-width="1" opacity="0.3"/>
+        </g>
+        <text x="40" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#7c3aed" font-weight="600">Qdrant</text>
+    </g>
+
+    <!-- Bottom row: Docker -->
+    <g transform="translate(460, 280)" filter="url(#shadow)">
+        <rect x="0" y="0" width="80" height="80" rx="16" fill="#1e293b" stroke="#2496ed" stroke-width="1.5"/>
+        <!-- Docker whale simplified -->
+        <g transform="translate(40, 34)">
+            <rect x="-16" y="-8" width="8" height="6" rx="1" fill="#2496ed" opacity="0.6"/>
+            <rect x="-6" y="-8" width="8" height="6" rx="1" fill="#2496ed" opacity="0.6"/>
+            <rect x="4" y="-8" width="8" height="6" rx="1" fill="#2496ed" opacity="0.6"/>
+            <rect x="-16" y="-16" width="8" height="6" rx="1" fill="#2496ed" opacity="0.6"/>
+            <rect x="-6" y="-16" width="8" height="6" rx="1" fill="#2496ed" opacity="0.6"/>
+            <rect x="4" y="-16" width="8" height="6" rx="1" fill="#2496ed" opacity="0.6"/>
+            <path d="M-20,0 Q-20,10 0,12 Q20,10 24,0 Z" fill="#2496ed" opacity="0.4"/>
+        </g>
+        <text x="40" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="#2496ed" font-weight="600">Docker</text>
+    </g>
+
+    <!-- Bottom label -->
+    <!-- <text x="450" y="390" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#64748b">github.com/daniellaera/spring-vuejs-book-management</text>-->
+</svg>
