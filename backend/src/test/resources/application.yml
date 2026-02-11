@@ -22,3 +22,14 @@ jwt:
 quartz:
   scheduler:
     cron: "0 0 0 * * ?"  # Every day at midnight
+
+qdrant:
+  url: http://localhost:6333
+  collection: books
+
+ai:
+  enabled: true
+  daily-limit: 20
+
+ollama:
+  api-url: http://localhost:11434
