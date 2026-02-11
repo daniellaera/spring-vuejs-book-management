@@ -68,3 +68,6 @@ springdoc:
     path: /swagger-ui.html
     # This ensures the internal resources are mapped correctly
     operations-sorter: alpha
+
+server:
+  forward-headers-strategy: framework
