@@ -68,12 +68,15 @@ public class SecurityConfig {
                     // Borrow - MUST be protected!
                     auth.requestMatchers("/api/v3/borrow/**").hasAuthority("USER");
 
-                    // AI & other public endpoints
+                    // AI streaming public
+                    auth.requestMatchers("/api/v3/ai/books/ask/stream").permitAll();
+
+                    // AI protected endpoints
                     auth.requestMatchers("/api/v3/ai/books/ask/**").hasAuthority("USER");
                     auth.requestMatchers("/api/v3/ai/books/remaining").hasAuthority("USER");
-                    auth.requestMatchers("/api/v3/ai/**").permitAll(); // index, search
-                    auth.requestMatchers("/api/v3/version").permitAll();
-                    auth.requestMatchers("/api/v3/features/**").permitAll();
+
+                    // Other AI endpoints
+                    auth.requestMatchers("/api/v3/ai/**").permitAll();
 
                     // GitHub OAuth (if enabled)
                     if (oauth2Properties.isEnabled()) {

@@ -5,9 +5,9 @@ import { routes } from './app.routes';
 
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
-import {provideHttpClient, withInterceptors} from '@angular/common/http';
-import {ConfirmationService, MessageService} from 'primeng/api';
-import {authInterceptor} from './interceptors/auth-interceptor';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { authInterceptor } from './interceptors/auth-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
