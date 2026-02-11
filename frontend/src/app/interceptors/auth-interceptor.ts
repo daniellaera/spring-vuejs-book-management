@@ -40,7 +40,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     pathname.includes(endpoint)
   );
 
-  // Only add token if NOT a public endpoint
+  // Only add token if not a public endpoint
   if (token && !isPublicGet && !isAlwaysPublic && !isTokenExpired(token)) {
     req = req.clone({
       setHeaders: {
@@ -49,7 +49,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
-  // Clear expired tokens
+  // clear expired tokens
   if (token && isTokenExpired(token)) {
     console.log('Token expired, clearing storage');
     localStorage.removeItem('auth_token');

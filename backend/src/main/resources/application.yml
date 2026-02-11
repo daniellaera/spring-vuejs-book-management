@@ -34,7 +34,7 @@ jwt:
   jwtRefreshExpirationMs: 86400000
 
 frontend:
-  url: ${FRONTEND_URL}  # Frontend URL as environment variable
+  url: ${FRONTEND_URL}
 
 social:
   feature:
