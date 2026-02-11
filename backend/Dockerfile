@@ -10,6 +10,7 @@ COPY src /app/src
 
 # Accept version as build arg
 ARG APP_VERSION=dev
+
 RUN mvn -f /app/pom.xml clean package -DskipTests -Drevision=${APP_VERSION}
 
 FROM eclipse-temurin:21-jre-jammy
