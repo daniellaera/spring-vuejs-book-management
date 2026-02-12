@@ -56,6 +56,7 @@ qdrant:
 ai:
   enabled: true
   daily-limit: 20
+  search-limit: 50
 
 ollama:
   api-url: ${OLLAMA_URL}

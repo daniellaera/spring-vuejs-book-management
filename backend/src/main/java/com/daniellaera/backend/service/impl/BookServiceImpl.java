@@ -37,6 +37,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public long getTotalBookCount() {
+        return bookRepository.count();
+    }
+
+    @Override
     public Page<BookDTO> getAllBooks(Pageable pageable, String search) {
         return bookRepository.findAllBooksOptimized(pageable, search);
     }
@@ -75,30 +80,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Page<BookAiView> getBookList(Pageable pageable) {
-        return bookRepository.findBookList(pageable)
-                .map(p -> new BookAiView(
-                        p.getId(),
-                        p.getTitle(),
-                        p.getAuthor(),
-                        p.getIsAvailable()
-                ));
-    }
-
-    @Override
-    public List<BookAiView> searchByKeyword(String keyword) {
-        log.info("Searching database for keyword: {}", keyword);
-
-        // Using a derived query method from the repository
-        return bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(keyword, keyword)
-                .stream()
-                .map(p -> new BookAiView(
-                        p.getId(),
-                        p.getTitle(),
-                        p.getAuthor(),
-                        p.getIsAvailable()
-                ))
-                .toList();
+    public List<BookAiView> getBooksAiOptimizedView(List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return bookRepository.findAllAiViewsByIds(ids);
     }
 
     @Override

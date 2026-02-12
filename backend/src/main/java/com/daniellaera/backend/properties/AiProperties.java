@@ -9,6 +9,7 @@ public class AiProperties {
 
     private boolean enabled = true;
     private int dailyLimit = 20;
+    private int searchLimit;
 
     public boolean isEnabled() {
         return enabled;
@@ -24,5 +25,13 @@ public class AiProperties {
 
     public void setDailyLimit(int dailyLimit) {
         this.dailyLimit = dailyLimit;
+    }
+
+    public int getSearchLimit() {
+        return searchLimit;
+    }
+
+    public void setSearchLimit(int searchLimit) {
+        this.searchLimit = searchLimit;
     }
 }

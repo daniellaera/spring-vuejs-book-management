@@ -1,5 +1,6 @@
 package com.daniellaera.backend.controller;
 
+import com.daniellaera.backend.dao.BookAiView;
 import com.daniellaera.backend.dao.BookDTO;
 import com.daniellaera.backend.properties.AiProperties;
 import com.daniellaera.backend.service.*;
@@ -58,7 +59,7 @@ public class BookAiController {
         return ids.stream()
                 .map(id -> bookService.findBookById(id).orElse(null)) // returns Optional<BookDTO>
                 .filter(Objects::nonNull)
-                .filter(b -> b.getTitle().toLowerCase().contains(queryLower))
+                //.filter(b -> b.getTitle().toLowerCase().contains(queryLower))
                 .toList();
     }
 
@@ -134,45 +135,43 @@ public class BookAiController {
         }
     }
 
+    /**
+     * The Heart of the RAG system: Assembles the prompt dynamically.
+     */
     private String buildSmartPrompt(String question) {
-        List<Integer> relevantIds = qdrantSearch.searchSimilarBooks(question, 15);
+        // 1. DYNAMIC COUNT: Tells Claude how big the library is
+        long totalLibrarySize = bookService.getTotalBookCount();
 
-        List<BookDTO> books;
-        if (!relevantIds.isEmpty()) {
-            books = relevantIds.stream()
-                    .map(id -> bookService.findBookById(id).orElse(null))
-                    .filter(Objects::nonNull)
-                    .toList();
-        } else {
-            books = bookService.getAllBooks(
-                    PageRequest.of(0, 100), null
-            ).getContent();
-        }
+        // 2. VECTOR SEARCH: Gets relevant IDs
+        List<Integer> relevantIds = qdrantSearch.searchSimilarBooks(question, aiProperties.getSearchLimit());
 
+        // 3. SLIM DATA FETCH: Converts IDs to Record Views
+        List<BookAiView> books = bookService.getBooksAiOptimizedView(relevantIds);
+
+        // 4. CONTEXT BUILDING: Uses Record Accessors (id(), title(), etc.)
         String bookContext = books.stream()
-                .map(b -> String.join(" | ",
-                        "ID: " + b.getId(),
-                        "Title: " + b.getTitle(),
-                        "Author: " + b.getAuthor(),
-                        "Genre: " + b.getGenre(),
-                        "Available: " + (Boolean.TRUE.equals(b.getIsAvailable()) ? "Yes" : "No"),
-                        "Rating: " + (b.getAverageRating() != null ? b.getAverageRating() : "N/A"),
-                        "Comments: " + (b.getComments() != null ? b.getComments().size() : 0)
-                ))
+                .map(b -> String.format("ID: %d | Title: %s | Author: %s | Rating: %s | Available: %s",
+                        b.id(), b.title(), b.author(),
+                        b.averageRating() != null ? b.averageRating() : "N/A",
+                        b.available() ? "Yes" : "No"))
                 .collect(Collectors.joining("\n"));
 
+        // 5. THE FINAL SYSTEM PROMPT
         return """
-                You are a library assistant inside a small chat widget.
-                Rules:
-                - Be very concise, short answers
-                - No markdown, no bold, no bullet points
-                - Use numbered lists, one book per line
-                - Format each book as: "1. Title - Author (Rating: X)"
-                - Only include details the user asked about
-                - Keep answers under 10 lines when possible
-                
-                Book catalog:
-                %s
-                """.formatted(bookContext);
+            You are a library assistant for a private collection.
+            
+            Current Library Metadata:
+            - Total books in database: %d
+            - The following %d books are the most relevant matches found for the user's query.
+            
+            Search Results Context:
+            %s
+            
+            Instructions:
+            1. If the user's question can be answered by the metadata above, do so concisely.
+            2. If the user asks about the "entire catalog", mention there are %d books total.
+            3. If a book is marked as 'Available: No', mention it is currently borrowed.
+            4. Keep responses short and professional.
+            """.formatted(totalLibrarySize, books.size(), bookContext, totalLibrarySize);
     }
 }

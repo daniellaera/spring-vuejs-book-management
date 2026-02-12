@@ -22,9 +22,7 @@ public interface BookService {
 
     void updateExpiredBookStatus();
 
-    // AI / fast listing
-    Page<BookAiView> getBookList(Pageable pageable);
+    long getTotalBookCount();
 
-    // NEW: Search books by keyword in title or author
-    List<BookAiView> searchByKeyword(String keyword);
+    List<BookAiView> getBooksAiOptimizedView(List<Integer> relevantIds);
 }
