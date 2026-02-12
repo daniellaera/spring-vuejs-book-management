@@ -16,7 +16,7 @@ export interface Book {
   createdDate?: Date;
   image?: string;
 
-  // Relationships
+  // relationships
   comments?: CommentDTO[];
   ratings?: RatingDTO[];
   borrow?: BorrowDTO | null;

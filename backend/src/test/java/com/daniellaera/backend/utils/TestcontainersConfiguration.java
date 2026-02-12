@@ -6,15 +6,12 @@ import org.springframework.context.annotation.Bean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import java.time.Duration;
-
 @TestConfiguration(proxyBeanMethods = false)
 public class TestcontainersConfiguration {
 
     @Bean
     @ServiceConnection
     PostgreSQLContainer<?> postgresContainer() {
-        return new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"))
-                .withStartupTimeout(Duration.ofMinutes(3));
+        return new PostgreSQLContainer<>(DockerImageName.parse("postgres:18.1-alpine"));
     }
 }
