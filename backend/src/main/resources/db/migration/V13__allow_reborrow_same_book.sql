@@ -1,0 +1,1 @@
+ALTER TABLE _borrow DROP CONSTRAINT _borrow_book_id_user_id_key;

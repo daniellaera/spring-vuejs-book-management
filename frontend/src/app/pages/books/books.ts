@@ -92,7 +92,7 @@ export class Books implements OnInit {
 
   onSearch(): void {
     if (this.table) {
-      // ✅ reset() automatically sets first=0 and triggers onLazyLoad
+      // reset() automatically sets first=0 and triggers onLazyLoad
       this.table.reset();
     } else {
       // Fallback if table isn't ready
