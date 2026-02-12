@@ -6,6 +6,7 @@ import com.daniellaera.backend.model.Borrow;
 import com.daniellaera.backend.model.User;
 import com.daniellaera.backend.repository.BookRepository;
 import com.daniellaera.backend.repository.UserRepository;
+import com.daniellaera.backend.service.AiCacheService;
 import com.daniellaera.backend.service.BorrowService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -21,16 +22,18 @@ public class BorrowServiceImpl implements BorrowService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final BorrowRepository borrowRepository;
+    private final AiCacheService aiCacheService;
 
     @Autowired
     public BorrowServiceImpl(
             UserRepository userRepository,
             BookRepository bookRepository,
-            BorrowRepository borrowRepository
+            BorrowRepository borrowRepository, AiCacheService aiCacheService
     ) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.borrowRepository = borrowRepository;
+        this.aiCacheService = aiCacheService;
     }
 
     /**
@@ -81,6 +84,8 @@ public class BorrowServiceImpl implements BorrowService {
         book.setIsAvailable(false);
         bookRepository.save(book);
         log.info("Setting Book with ID: {} to unavailable (isAvailable = false)", bookId);
+
+        aiCacheService.clear();
 
         return convertBorrowToBorrowDTO(savedBorrow);
     }

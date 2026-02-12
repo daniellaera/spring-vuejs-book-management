@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import {Observable, of, tap} from 'rxjs';
-import {Book, PageResponse} from '../models/book.model';
+import {Observable} from 'rxjs';
+import {Book} from '../models/book.model';
 import {environment} from '../../environments/environment';
 import {CreateBookDTO} from '../models/create-book.model';
+import {PageResponse} from '../models/page-response.model';
 
 @Injectable({
   providedIn: 'root'
