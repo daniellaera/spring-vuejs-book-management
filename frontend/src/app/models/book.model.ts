@@ -1,7 +1,7 @@
-import {CommentDTO} from './comment.model';
-import {RatingDTO} from './rating.model';
-import {BorrowDTO} from './borrow.model';
-import {UserDTO} from './user.model';
+import { CommentDTO } from './comment.model';
+import { RatingDTO } from './rating.model';
+import { BorrowDTO } from './borrow.model';
+import { UserDTO } from './user.model';
 
 export interface Book {
   id: number;
