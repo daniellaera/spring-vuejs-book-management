@@ -4,6 +4,7 @@ import com.daniellaera.backend.dao.BookDTO;
 import com.daniellaera.backend.properties.AiProperties;
 import com.daniellaera.backend.service.*;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -134,7 +135,7 @@ public class BookAiController {
     }
 
     private String buildSmartPrompt(String question) {
-        List<Integer> relevantIds = qdrantSearch.searchSimilarBooks(question, 5);
+        List<Integer> relevantIds = qdrantSearch.searchSimilarBooks(question, 15);
 
         List<BookDTO> books;
         if (!relevantIds.isEmpty()) {
@@ -144,7 +145,7 @@ public class BookAiController {
                     .toList();
         } else {
             books = bookService.getAllBooks(
-                    org.springframework.data.domain.PageRequest.of(0, 50), null
+                    PageRequest.of(0, 100), null
             ).getContent();
         }
 

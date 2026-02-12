@@ -125,7 +125,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     const seconds = time % 60;
 
     if (hours > 0) {
-      return `${hours}h ${minutes.toString().padStart(2, '0')}m`;
+      return `${hours}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
     }
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
