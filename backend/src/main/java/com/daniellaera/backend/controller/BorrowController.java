@@ -42,4 +42,18 @@ public class BorrowController {
 
         return ResponseEntity.ok(borrowService.createBorrowByBookIdAndUserId(bookId, userEmail, borrowDTO));
     }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @PutMapping("/return/{bookId}")
+    public ResponseEntity<BorrowDTO> returnBook(
+            Authentication authentication,
+            @PathVariable Integer bookId) {
+
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        String userEmail = authentication.getName();
+        return ResponseEntity.ok(borrowService.returnBookByBookIdAndUserEmail(bookId, userEmail));
+    }
 }

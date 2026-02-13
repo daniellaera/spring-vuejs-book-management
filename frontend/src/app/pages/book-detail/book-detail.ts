@@ -3,9 +3,9 @@ import {Book} from '../../models/book.model';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BookService} from '../../services/book.service';
 import {ConfirmationService, MessageService, PrimeTemplate} from 'primeng/api';
-import {Card, CardModule} from 'primeng/card';
-import {Tag, TagModule} from 'primeng/tag';
-import {Divider, DividerModule} from 'primeng/divider';
+import {CardModule} from 'primeng/card';
+import {TagModule} from 'primeng/tag';
+import {DividerModule} from 'primeng/divider';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {ButtonModule} from 'primeng/button';
@@ -224,5 +224,52 @@ export class BookDetail implements OnInit {
     if (currentBookId) {
       this.loadBookDetails(currentBookId);
     }
+  }
+
+  protected isBorrower = computed(() => {
+    const currentBook = this.book();
+    const currentUserId = this.authService.userDetails().userId;
+    return currentBook?.borrow
+      && !currentBook.borrow.isReturned
+      && currentBook.borrow.userId === currentUserId;
+  });
+
+  protected confirmReturn(): void {
+    this.confirmationService.confirm({
+      message: 'Do you want to return this book?',
+      header: 'Return Confirmation',
+      icon: 'pi pi-undo',
+      acceptButtonStyleClass: 'p-button-warning p-button-text',
+      rejectButtonStyleClass: 'p-button-text',
+      acceptIcon: 'none',
+      rejectIcon: 'none',
+      accept: () => {
+        this.returnBook();
+      }
+    });
+  }
+
+  private returnBook(): void {
+    const currentBook = this.book();
+    if (!currentBook?.id) return;
+
+    this.bookService.returnBook(currentBook.id).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Book returned successfully!'
+        });
+        this.loadBookDetails(currentBook.id);
+      },
+      error: (error) => {
+        console.error('Error returning book:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to return book'
+        });
+      }
+    });
   }
 }

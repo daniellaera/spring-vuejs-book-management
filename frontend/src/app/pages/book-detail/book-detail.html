@@ -120,14 +120,30 @@
               @if (hasBorrow()) {
                 <div class="borrow-info-card">
                   <p class="font-semibold mb-3">Currently Borrowed</p>
+
                   <p-datePicker
                     [(ngModel)]="borrowDates"
                     selectionMode="range"
                     [inline]="true"
                     [showWeek]="true"
                     [readonlyInput]="true"
+                    [disabled]="true"
                     dateFormat="dd/mm/yy">
                   </p-datePicker>
+
+                  <p class="text-sm text-color-secondary mt-2">
+                    Available after {{ formatDate(book()!.borrow!.borrowEndDate) }}
+                  </p>
+
+                  @if (isBorrower()) {
+                    <p-button
+                      label="Return This Book"
+                      icon="pi pi-undo"
+                      severity="warn"
+                      styleClass="w-full mt-3"
+                      (onClick)="confirmReturn()">
+                    </p-button>
+                  }
                 </div>
               } @else {
                 <div class="available-card">

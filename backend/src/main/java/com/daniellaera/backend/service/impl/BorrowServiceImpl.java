@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 @Component
 @Slf4j
 public class BorrowServiceImpl implements BorrowService {
@@ -99,6 +101,34 @@ public class BorrowServiceImpl implements BorrowService {
         log.info("Successfully fetched Borrow record for Book ID: {}", bookId);
 
         return convertBorrowToBorrowDTO(borrow);
+    }
+
+    @Transactional
+    @Override
+    public BorrowDTO returnBookByBookIdAndUserEmail(Integer bookId, String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userEmail));
+
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found with ID: " + bookId));
+
+        Borrow activeBorrow = book.getBorrows().stream()
+                .filter(b -> b.getUser().getId().equals(user.getId()) && !b.getIsReturned())
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No active borrow found for this book and user"));
+
+        activeBorrow.setIsReturned(true);
+        activeBorrow.setBorrowEndDate(new Date());
+        book.setIsAvailable(true);
+
+        borrowRepository.save(activeBorrow);
+        bookRepository.save(book);
+
+        aiCacheService.clear();
+
+        log.info("Book '{}' (ID: {}) returned by user '{}'", book.getTitle(), bookId, userEmail);
+
+        return convertBorrowToBorrowDTO(activeBorrow);
     }
 
     private BorrowDTO convertBorrowToBorrowDTO(Borrow savedBorrow) {

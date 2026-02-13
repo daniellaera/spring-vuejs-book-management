@@ -8,4 +8,6 @@ public interface BorrowService {
     BorrowDTO createBorrowByBookIdAndUserId(Integer bookId, String userEmail, BorrowDTO borrowDTO);
 
     BorrowDTO getBorrowByBookId(Integer bookId);
+
+    BorrowDTO returnBookByBookIdAndUserEmail(Integer bookId, String userEmail);
 }

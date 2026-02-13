@@ -5,6 +5,7 @@ import {Book} from '../models/book.model';
 import {environment} from '../../environments/environment';
 import {CreateBookDTO} from '../models/create-book.model';
 import {PageResponse} from '../models/page-response.model';
+import {BorrowDTO} from '../models/borrow.model';
 
 @Injectable({
   providedIn: 'root'
@@ -58,5 +59,9 @@ export class BookService {
 
   createBook(book: CreateBookDTO): Observable<Book> {
     return this.http.post<Book>(this.apiUrl, book);
+  }
+
+  returnBook(bookId: number): Observable<BorrowDTO> {
+    return this.http.put<BorrowDTO>(`${environment.apiUrl}/borrow/return/${bookId}`, {});
   }
 }

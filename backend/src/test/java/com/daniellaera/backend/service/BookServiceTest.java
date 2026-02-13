@@ -50,10 +50,13 @@ public class BookServiceTest {
     @Mock
     private BorrowRepository borrowRepository;
 
+    @Mock
+    private AiCacheService aiCacheService;
+
     @BeforeEach
     public void setUp() {
         // to remove in case we @InjectMocks of bookServiceImpl
-        bookService = new BookServiceImpl(bookRepository, userRepository, borrowRepository);
+        bookService = new BookServiceImpl(bookRepository, userRepository, borrowRepository, aiCacheService);
     }
 
     @Test
@@ -183,5 +186,78 @@ public class BookServiceTest {
 
         assertThat(exception.getMessage()).isEqualTo("Book not found with id: " + bookId);
         verify(bookRepository, never()).delete(any(Book.class));
+    }
+
+    @Test
+    void getTotalBookCount_ShouldReturnCount() {
+        when(bookRepository.count()).thenReturn(42L);
+
+        long count = bookService.getTotalBookCount();
+
+        assertThat(count).isEqualTo(42L);
+        verify(bookRepository, times(1)).count();
+    }
+
+    @Test
+    void getAllBooks_ShouldPassSearchParam() {
+        Page<BookDTO> page = new PageImpl<>(List.of());
+        when(bookRepository.findAllBooksOptimized(any(Pageable.class), eq("harry")))
+                .thenReturn(page);
+
+        Page<BookDTO> result = bookService.getAllBooks(PageRequest.of(0, 5), "harry");
+
+        assertThat(result).isNotNull();
+        verify(bookRepository).findAllBooksOptimized(any(Pageable.class), eq("harry"));
+    }
+
+    @Test
+    void getAllBooks_ShouldNotTouchAiCache() {
+        Page<BookDTO> page = new PageImpl<>(List.of(new BookDTO()));
+        when(bookRepository.findAllBooksOptimized(any(Pageable.class), any()))
+                .thenReturn(page);
+
+        bookService.getAllBooks(PageRequest.of(0, 10), null);
+
+        verifyNoInteractions(aiCacheService);
+    }
+
+    @Test
+    void createBook_ShouldClearAiCache() {
+        BookDTO bookDTO = new BookDTO();
+        bookDTO.setTitle("Test Book");
+
+        User user = new User();
+        user.setId(1);
+        user.setEmail("test@example.com");
+
+        Book book = new Book();
+        book.setId(1);
+        book.setTitle("Test Book");
+        book.setCreatedBy(user); // 👈 THIS fixes the NPE
+
+        when(userRepository.findByEmail("test@example.com"))
+                .thenReturn(Optional.of(user));
+        when(bookRepository.save(any(Book.class)))
+                .thenReturn(book);
+
+        // Act
+        bookService.createBook(bookDTO, "test@example.com");
+
+        // Assert
+        verify(aiCacheService, times(1)).clear();
+    }
+
+    @Test
+    void deleteBook_ShouldClearAiCache() {
+        Book book = new Book();
+        book.setId(1);
+
+        when(bookRepository.findById(1)).thenReturn(Optional.of(book));
+
+        // Act
+        bookService.deleteBook(1);
+
+        // Assert
+        verify(aiCacheService, times(1)).clear();
     }
 }

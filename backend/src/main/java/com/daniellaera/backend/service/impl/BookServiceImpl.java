@@ -4,8 +4,10 @@ import com.daniellaera.backend.dao.*;
 import com.daniellaera.backend.model.*;
 import com.daniellaera.backend.repository.BookRepository;
 import com.daniellaera.backend.repository.UserRepository;
+import com.daniellaera.backend.service.AiCacheService;
 import com.daniellaera.backend.service.BookService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,14 +28,16 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
     private final BorrowRepository borrowRepository;
+    private final AiCacheService aiCacheService;
 
     @Autowired
     public BookServiceImpl(BookRepository bookRepository,
                            UserRepository userRepository,
-                           BorrowRepository borrowRepository) {
+                           BorrowRepository borrowRepository, AiCacheService aiCacheService) {
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
         this.borrowRepository = borrowRepository;
+        this.aiCacheService = aiCacheService;
     }
 
     @Override
@@ -66,6 +70,8 @@ public class BookServiceImpl implements BookService {
 
         Book savedBook = bookRepository.save(book);
 
+        aiCacheService.clear();
+
         return convertBookEntityToBookDto(savedBook);
     }
 
@@ -77,6 +83,7 @@ public class BookServiceImpl implements BookService {
         });
         bookRepository.delete(book);
         log.info("Book with id: {} deleted", bookId);
+        aiCacheService.clear();
     }
 
     @Override
@@ -88,43 +95,55 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public void updateExpiredBookStatus() {
-        // Convert LocalDate.now() to Date for compatibility
-        Date currentDate = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        // Use tomorrow midnight so borrows expiring TODAY are included
+        Date cutoffDate = Date.from(
+                LocalDate.now().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
+        );
 
-        // Fetch only books with borrow end date before the current date AND isAvailable = false
-        List<Book> expiredBorrowBooks = bookRepository.findByBorrows_BorrowEndDateBeforeAndIsAvailableFalse(currentDate);
+        List<Book> expiredBorrowBooks = bookRepository.findByBorrows_BorrowEndDateBeforeAndIsAvailableFalse(cutoffDate);
 
-        // Check if there are any expired books
         if (expiredBorrowBooks.isEmpty()) {
             log.info("No expired books to update.");
             return;
         }
 
-        // Update the status of each expired borrow in those books
-        for (Book book : expiredBorrowBooks) {
-            List<Borrow> borrows = book.getBorrows();
+        int updatedCount = 0;
 
-            // Find the active borrow (if any) that has expired
-            Borrow activeBorrow = borrows
+        for (Book book : expiredBorrowBooks) {
+            Borrow activeBorrow = book.getBorrows()
                     .stream()
-                    .filter(brw -> brw.getBorrowEndDate().before(currentDate) && !brw.getIsReturned())
+                    .filter(brw -> !brw.getIsReturned())
                     .findFirst()
                     .orElse(null);
 
             if (activeBorrow != null) {
-                log.debug("Updating book with ID: {} and borrow with ID: {}", book.getId(), activeBorrow.getId());
-                // mark borrow as returned and book as available
+                log.info("Returning '{}' (ID: {}) - borrow expired on {}",
+                        book.getTitle(), book.getId(), activeBorrow.getBorrowEndDate());
+
                 activeBorrow.setIsReturned(true);
                 book.setIsAvailable(true);
 
-                // save changes to both borrow and book
                 borrowRepository.save(activeBorrow);
                 bookRepository.save(book);
+                updatedCount++;
+            } else {
+                // Book unavailable but all borrows returned — fix inconsistency
+                log.warn("Book '{}' (ID: {}) is unavailable but has no active borrows - fixing",
+                        book.getTitle(), book.getId());
+                book.setIsAvailable(true);
+                bookRepository.save(book);
+                updatedCount++;
             }
         }
 
-        log.info("Updated {} books to available.", expiredBorrowBooks.size());
+        if (updatedCount > 0) {
+            aiCacheService.clear();
+            log.info("Updated {} books to available.", updatedCount);
+        } else {
+            log.info("Found {} expired borrows but none needed updating.", expiredBorrowBooks.size());
+        }
     }
 
     private Book convertBookDTOToBookEntity(BookDTO bookDTO) {
