@@ -98,6 +98,7 @@ spring-book-management
 │   │   ├── db/migration/   → Flyway SQL migrations
 │   │   ├── application.yml → Production config (env vars)
 │   │   └── application-dev.yml → Local dev config
+│   ├── docker-compose.db.yml
 │   └── pom.xml
 ├── frontend/               → Angular 21 SPA
 │   ├── src/app/
@@ -126,7 +127,8 @@ spring-book-management
 **1. Start infrastructure:**
 
 ```bash
-docker compose up -d   # PostgreSQL + Qdrant
+cd backend
+docker compose -f ./docker-compose.db.yml up   # PostgreSQL + Qdrant
 ```
 
 **2. Pull the embedding model:**
